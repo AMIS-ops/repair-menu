@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Q哥手機/平板現場維修報價與介紹系統</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+              800: '#9f1239',
+              accent: '#ff2e63'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* Custom scrollbars and iPad UX enhancements */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #475569;
+    }
+    /* Touch optimization */
+    button, input, select {
+      touch-action: manipulation;
+    }
+    .large-text-mode {
+      font-size: 1.15rem;
+    }
+    .large-text-mode .item-title {
+      font-size: 1.3rem !important;
+    }
+    .large-text-mode .item-price {
+      font-size: 1.4rem !important;
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 font-sans antialiased select-none flex flex-col transition-colors duration-200">
+
+  <!-- TOP BAR / HEADER -->
+  <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand Logo & Title -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-rose-400 flex items-center justify-center text-white shadow-md shadow-brand-500/20 font-black text-xl tracking-wider">
+            Q
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 dark:text-white">Q哥現場維修報價系統</h1>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300">門市專用版</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">即時價格查詢 ‧ 原副廠說明 ‧ 電池雙項95折自動試算</p>
+          </div>
+        </div>
+
+        <!-- Main Category Toggle (iPhone vs iPad) -->
+        <div class="flex items-center bg-slate-100 dark:bg-slate-700/60 p-1 rounded-xl border border-slate-200/80 dark:border-slate-600/50">
+          <button id="btn-cat-iphone" onclick="switchMainCategory('iphone')" class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-150 shadow-sm bg-white dark:bg-slate-800 text-brand-600 dark:text-rose-400">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+            <span>iPhone 全系列</span>
+          </button>
+          <button id="btn-cat-ipad" onclick="switchMainCategory('ipad')" class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-150">
+            <i class="fa-solid fa-tablet-screen-button"></i>
+            <span>iPad 全系列</span>
+          </button>
+        </div>
+
+        <!-- Utility Buttons -->
+        <div class="flex items-center gap-2">
+          <!-- Screen Info / Spec Comparison Modal Launcher -->
+          <button onclick="openSpecModal()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-circle-info text-brand-500"></i>
+            <span class="hidden md:inline">原副廠與保固說明</span>
+          </button>
+
+          <!-- Large Text Mode Toggle -->
+          <button id="btn-large-font" onclick="toggleLargeFont()" title="大字展示模式 (適合與顧客對面溝通)" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-font text-indigo-500"></i>
+            <span class="hidden md:inline">大字展示</span>
+          </button>
+
+          <!-- Dark Mode Toggle -->
+          <button onclick="toggleDarkMode()" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+            <i class="fa-solid fa-moon dark:hidden"></i>
+            <i class="fa-solid fa-sun hidden dark:inline text-amber-400"></i>
+          </button>
+
+          <!-- Admin Mode Toggle -->
+          <button onclick="toggleAdminMode()" id="btn-admin-mode" class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition" title="管理員密碼修改價格">
+            <i class="fa-solid fa-lock"></i>
+          </button>
+
+          <!-- Cart Drawer Toggle (Mobile/Tablet) -->
+          <button onclick="toggleCartDrawer()" class="relative md:hidden p-2.5 rounded-xl bg-brand-600 text-white shadow-md shadow-brand-500/30 font-bold flex items-center gap-1">
+            <i class="fa-solid fa-receipt"></i>
+            <span id="mobile-cart-count" class="text-xs bg-white text-brand-700 rounded-full w-5 h-5 flex items-center justify-center font-extrabold">0</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER (Grid layout with side cart for iPad view) -->
+  <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 flex gap-6 overflow-hidden">
+    
+    <!-- LEFT / CENTER AREA: Model Selector & Repair Services -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto pr-1 pb-16">
+      
+      <!-- SUB-SERIES FILTER PILLS & SEARCH BAR -->
+      <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm mb-4">
+        
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-3">
+          <!-- Search Box -->
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+            <input type="text" id="input-search" oninput="handleSearch(this.value)" placeholder="搜尋機型名稱或 iPad A編號 (例如: 15 Pro, A2602, mini6)..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 dark:bg-slate-900 border border-transparent focus:border-brand-500 dark:focus:border-brand-500 rounded-xl text-sm focus:outline-none transition">
+            <button id="btn-clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <!-- Selected Model Badge -->
+          <div class="flex items-center justify-between sm:justify-end gap-2 bg-slate-50 dark:bg-slate-900/60 px-3 py-2 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
+            <span class="text-xs text-slate-500 dark:text-slate-400">當前選擇機型:</span>
+            <span id="current-model-display" class="font-extrabold text-sm text-brand-600 dark:text-rose-400">請選擇下方機型</span>
+          </div>
+        </div>
+
+        <!-- Series Filter Pills -->
+        <div id="series-pills-container" class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs font-semibold">
+          <!-- Generated dynamically -->
+        </div>
+
+        <!-- Model Select Cards Horizontal Carousel -->
+        <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/60">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+            <span>選擇具體機型 (<span id="model-count">0</span> 款)</span>
+            <span id="ipad-a-hint" class="text-[11px] text-indigo-500 hidden font-normal">💡 可輸入 iPad 背面 Axxxx 編號迅速定位</span>
+          </div>
+          <div id="model-buttons-grid" class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+            <!-- Models generated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SERVICE CATEGORY TABS (Inside selected model) -->
+      <div id="service-section" class="flex-1 flex flex-col">
+        
+        <!-- Category Filter Tabs -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200 dark:border-slate-700 mb-4 text-xs font-bold">
+          <button onclick="filterServiceCategory('all')" class="service-tab-btn active px-3.5 py-2 rounded-xl bg-brand-600 text-white shadow-sm transition whitespace-nowrap" data-cat="all">
+            <i class="fa-solid fa-list-ul mr-1"></i> 全部服務項目
+          </button>
+          <button onclick="filterServiceCategory('hot')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 hover:bg-amber-200 transition whitespace-nowrap" data-cat="hot">
+            <i class="fa-solid fa-fire text-amber-500 mr-1"></i> 🔥 熱門快選 (螢幕/電池)
+          </button>
+          <button onclick="filterServiceCategory('screen')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="screen">
+            <i class="fa-solid fa-mobile-retro mr-1"></i> 螢幕維修
+          </button>
+          <button onclick="filterServiceCategory('battery')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="battery">
+            <i class="fa-solid fa-battery-three-quarters mr-1"></i> 電池換新
+          </button>
+          <button onclick="filterServiceCategory('camera')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="camera">
+            <i class="fa-solid fa-camera mr-1"></i> 鏡頭與FaceID
+          </button>
+          <button onclick="filterServiceCategory('flex')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="flex">
+            <i class="fa-solid fa-microchip mr-1"></i> 充電與排線按鍵
+          </button>
+          <button onclick="filterServiceCategory('housing')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="housing">
+            <i class="fa-solid fa-shield-halved mr-1"></i> 背蓋與中框
+          </button>
+          <button onclick="filterServiceCategory('motherboard')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="motherboard">
+            <i class="fa-solid fa-wrench mr-1"></i> 主機板維修救資料
+          </button>
+          <button onclick="filterServiceCategory('storage')" class="service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap" data-cat="storage">
+            <i class="fa-solid fa-hard-drive mr-1"></i> 容量升級
+          </button>
+        </div>
+
+        <!-- SPECIAL PROMO NOTICE BANNER -->
+        <div class="bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-amber-500/10 border border-amber-500/30 dark:border-amber-500/20 rounded-2xl p-3 mb-4 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="px-2.5 py-1 bg-amber-500 text-slate-900 font-extrabold text-xs rounded-lg shadow-sm animate-pulse">
+              🎉 現場門市獨家優惠
+            </span>
+            <span class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
+              「加換電池直接兩項 95 折處理」<span class="font-normal text-slate-600 dark:text-slate-400 hidden sm:inline">（系統已設定選取電池+任意項目自動折扣）</span>
+            </span>
+          </div>
+          <button onclick="openSpecModal()" class="text-xs text-brand-600 dark:text-rose-400 underline font-bold whitespace-nowrap">
+            常見說明 <i class="fa-solid fa-chevron-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- REPAIR SERVICES CARDS GRID -->
+        <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <!-- Populated by JS -->
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: LIVE QUOTE CART DRAWER (Responsive: Sticky on Desktop/iPad horizontal, Drawer on mobile) -->
+    <aside id="cart-drawer" class="fixed inset-y-0 right-0 z-40 w-full sm:w-96 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 shadow-2xl md:shadow-none md:static md:w-80 lg:w-96 md:border-l-0 md:bg-transparent md:dark:bg-transparent flex flex-col transform translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+      
+      <!-- Drawer Header -->
+      <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-800 md:rounded-t-2xl">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-calculator text-brand-600 dark:text-rose-400 text-lg"></i>
+          <h2 class="font-extrabold text-slate-900 dark:text-white text-base">現場維修估價單</h2>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="clearCart()" class="text-xs text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 font-semibold px-2 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="清空所有項目">
+            <i class="fa-solid fa-trash-can mr-1"></i>清空
+          </button>
+          <button onclick="toggleCartDrawer()" class="md:hidden text-slate-500 p-2">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected Model Info Box -->
+      <div class="p-3 bg-brand-50 dark:bg-rose-950/40 border-b border-brand-100 dark:border-rose-900/50 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] text-brand-700 dark:text-rose-300 font-semibold uppercase tracking-wider">維修手機/平板:</span>
+          <div id="cart-model-title" class="font-black text-slate-900 dark:text-white text-base">iPhone 15 Pro</div>
+        </div>
+        <span id="cart-item-count" class="text-xs font-bold px-2.5 py-1 bg-brand-600 text-white rounded-full">0 項</span>
+      </div>
+
+      <!-- Item List Container -->
+      <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+        <!-- Cart Items JS rendered -->
+        <div id="cart-empty-state" class="text-center py-12 text-slate-400">
+          <i class="fa-solid fa-basket-shopping text-4xl mb-3 text-slate-300 dark:text-slate-600"></i>
+          <p class="text-sm font-semibold">點擊左側維修服務以加入估價</p>
+          <p class="text-xs mt-1 text-slate-400">支援組合優惠自動計算</p>
+        </div>
+      </div>
+
+      <!-- Real-time Promo Discount Notification Banner inside Cart -->
+      <div id="cart-promo-badge" class="hidden px-4 py-2.5 bg-amber-500/15 border-y border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs font-bold flex items-center justify-between">
+        <span class="flex items-center gap-1.5">
+          <i class="fa-solid fa-tag text-amber-600 dark:text-amber-400"></i>
+          <span>符合「加換電池 95 折」優惠！</span>
+        </span>
+        <span id="cart-promo-saved" class="text-rose-600 dark:text-rose-400 font-extrabold">-NT$ 0</span>
+      </div>
+
+      <!-- Cart Calculation Footer -->
+      <div class="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 space-y-2 md:rounded-b-2xl shadow-lg">
+        
+        <div class="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
+          <span>項目原價總計</span>
+          <span id="cart-subtotal" class="font-bold text-slate-700 dark:text-slate-300">NT$ 0</span>
+        </div>
+
+        <div id="row-discount" class="flex justify-between items-center text-xs text-rose-600 dark:text-rose-400 font-bold">
+          <span>活動優惠折抵 (95折)</span>
+          <span id="cart-discount-total">-NT$ 0</span>
+        </div>
+
+        <!-- Custom Discount Input Toggle -->
+        <div class="pt-1 flex items-center justify-between text-xs">
+          <label class="flex items-center gap-1 text-slate-600 dark:text-slate-400 cursor-pointer">
+            <input type="checkbox" id="chk-extra-discount" onchange="toggleExtraDiscount()" class="rounded text-brand-600">
+            <span>自訂手動折抵</span>
+          </label>
+          <input type="number" id="input-extra-discount" oninput="renderCart()" placeholder="金額" class="hidden w-20 px-2 py-1 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded text-right text-xs font-bold">
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-baseline justify-between">
+          <div>
+            <span class="text-xs font-bold text-slate-500 dark:text-slate-400">現場估價總計</span>
+            <div class="text-[10px] text-slate-400">含稅/工本費/零件保固</div>
+          </div>
+          <div class="text-right">
+            <span id="cart-final-total" class="font-black text-2xl text-brand-600 dark:text-rose-400">NT$ 0</span>
+          </div>
+        </div>
+
+        <!-- Customer Confirmation Big Card Action Button -->
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button onclick="openCustomerConfirmModal()" class="w-full py-2.5 px-3 bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-tablet-button"></i>
+            <span>客戶確認卡</span>
+          </button>
+          <button onclick="copyQuoteToClipboard()" class="w-full py-2.5 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-extrabold text-xs sm:text-sm shadow-md shadow-brand-500/20 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-copy"></i>
+            <span>複製明細</span>
+          </button>
+        </div>
+
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- MODAL 1: SPEC & WARRANTY COMPARISON (原副廠螢幕/電池保固說明) -->
+  <div id="modal-spec" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      
+      <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-shield-virus text-brand-600 dark:text-rose-400 text-xl"></i>
+          <h3 class="font-extrabold text-lg text-slate-900 dark:text-white">螢幕/電池 規格與保固差異說明</h3>
+        </div>
+        <button onclick="closeSpecModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-6 text-sm">
+        
+        <!-- Screen Specs Comparison -->
+        <div>
+          <h4 class="font-extrabold text-base text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-mobile text-indigo-500"></i> 螢幕類別說明
+          </h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">Q哥嚴選高品質螢幕</span>
+              <h5 class="font-bold text-slate-900 dark:text-white mt-2">外玻璃破裂 vs 顯示觸控異常</h5>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
+                ‧ <b>外玻璃破裂</b>：僅表面玻璃破裂，顯示畫面無黑點/線條且觸控正常。<br>
+                ‧ <b>顯示觸控異常</b>：螢幕出現跳動、黑區、漏液或觸控失效。
+              </p>
+            </div>
+            <div class="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/50">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-600 text-white">Apple 原廠螢幕</span>
+              <h5 class="font-bold text-slate-900 dark:text-white mt-2">100% 原廠料件總成</h5>
+              <p class="text-xs text-indigo-900 dark:text-indigo-300 mt-1 leading-relaxed">
+                ‧ 提供原廠極致色彩與高畫質。<br>
+                ‧ iPhone 13 Pro / Pro Max 螢幕通病（白屏/綠屏）具專屬修復方案。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Battery Warranty Comparison -->
+        <div>
+          <h4 class="font-extrabold text-base text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-battery-charging text-emerald-500"></i> 電池保固方案說明
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300">電池保固 6 個月</span>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">經BSMI認證安全電芯，提供半年的基礎保固。</p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-900/50 relative">
+              <span class="absolute -top-2.5 right-3 px-2 py-0.5 bg-emerald-600 text-white font-extrabold text-[10px] rounded-full">熱銷推薦</span>
+              <span class="text-xs font-bold text-emerald-800 dark:text-emerald-300">電池終身保固 ⭐</span>
+              <p class="text-xs text-emerald-900 dark:text-emerald-400 mt-1">更換後只要健康度低於 80%，憑保固紀錄無限次免費換新！</p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+              <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Apple 原廠電池</span>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">原廠授權料件，系統可完整讀取健康度資訊。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-item discount note -->
+        <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 flex items-start gap-3">
+          <i class="fa-solid fa-gift text-amber-600 dark:text-amber-400 text-xl mt-0.5"></i>
+          <div>
+            <h5 class="font-bold text-amber-900 dark:text-amber-200 text-sm">組合維修優惠規定</h5>
+            <p class="text-xs text-amber-800 dark:text-amber-300 mt-0.5">
+              凡同時維修「電池」與「其他任意維修項目」（如螢幕、背蓋、排線、主機板等），即可享有整單合規項目 95 折優惠處理。
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-right">
+        <button onclick="closeSpecModal()" class="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-bold text-sm shadow-md hover:bg-brand-700 transition">
+          我瞭解了
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 2: CUSTOMER CONFIRMATION FULLSCREEN CARD (客戶大字確認卡 - 拿給客人確認) -->
+  <div id="modal-customer" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between space-y-6">
+      
+      <!-- Top header -->
+      <div class="text-center border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-600 text-white text-2xl font-black mb-2">
+          Q
+        </div>
+        <h3 class="font-black text-2xl text-slate-900 dark:text-white">維修服務確認單</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">請客人確認以下維修型號與預估金額</p>
+      </div>
+
+      <!-- Main device & item summary -->
+      <div class="space-y-4">
+        
+        <div class="bg-slate-100 dark:bg-slate-800/80 p-4 rounded-2xl flex items-center justify-between">
+          <span class="text-slate-500 dark:text-slate-400 font-bold text-sm">手機/平板型號</span>
+          <span id="confirm-modal-model" class="font-black text-xl text-brand-600 dark:text-rose-400">iPhone 15 Pro</span>
+        </div>
+
+        <div class="space-y-2 max-h-48 overflow-y-auto">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">維修項目細項:</span>
+          <div id="confirm-modal-items" class="space-y-2">
+            <!-- JS populated -->
+          </div>
+        </div>
+
+        <!-- Final Total Banner -->
+        <div class="bg-gradient-to-br from-brand-600 to-rose-700 text-white p-5 rounded-2xl shadow-lg flex items-center justify-between">
+          <div>
+            <span class="text-xs opacity-90 font-bold uppercase tracking-wider">現場優惠總計</span>
+            <div id="confirm-modal-promo-note" class="text-[11px] opacity-80 mt-0.5">含電池組合優惠 95 折</div>
+          </div>
+          <div id="confirm-modal-total" class="font-black text-3xl sm:text-4xl">
+            NT$ 0
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom action -->
+      <div class="flex items-center gap-3">
+        <button onclick="closeCustomerConfirmModal()" class="flex-1 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-sm transition">
+          返回修改
+        </button>
+        <button onclick="confirmOrderSuccess()" class="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold rounded-xl text-sm shadow-lg shadow-emerald-600/30 transition">
+          確認無誤 開始維修
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL 3: ADMIN PASSWORD & PRICE EDITOR -->
+  <div id="modal-admin" class="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700">
+      
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-extrabold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-user-gear text-brand-600"></i> 門市管理員模式
+        </h3>
+        <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Password Prompt View -->
+      <div id="admin-login-view" class="space-y-4">
+        <p class="text-xs text-slate-500 dark:text-slate-400">請輸入管理員解鎖密碼（預設：<code class="font-mono bg-slate-100 dark:bg-slate-900 px-1 rounded">0000</code>）</p>
+        <div>
+          <input type="password" id="admin-pass-input" placeholder="請輸入4位數密碼" class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-center font-mono text-xl tracking-widest focus:outline-none focus:border-brand-500">
+        </div>
+        <button onclick="verifyAdminPassword()" class="w-full py-3 bg-brand-600 text-white font-extrabold rounded-xl text-sm shadow-md hover:bg-brand-700 transition">
+          驗證登入
+        </button>
+      </div>
+
+      <!-- Admin Actions View (Unlocked) -->
+      <div id="admin-controls-view" class="hidden space-y-4">
+        <div class="p-3 bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-xl flex items-center gap-2">
+          <i class="fa-solid fa-circle-check"></i> 管理員身分已驗證！您可以雙擊任何價格進行改價。
+        </div>
+
+        <div class="space-y-2">
+          <button onclick="resetPricesToDefault()" class="w-full py-2.5 px-3 bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 font-bold rounded-xl text-xs hover:bg-rose-200 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> 重置所有價格為表格預設值
+          </button>
+
+          <button onclick="exportPriceDataJSON()" class="w-full py-2.5 px-3 bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl text-xs hover:bg-slate-200 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-download"></i> 匯出當前價格 JSON 備份
+          </button>
+        </div>
+
+        <button onclick="lockAdminMode()" class="w-full py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold rounded-xl text-xs transition">
+          退出管理員模式
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION FLOATING -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-bold text-xs rounded-full shadow-2xl pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4 flex items-center gap-2">
+    <i class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+    <span id="toast-msg">已成功加入估價單</span>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION CORE -->
+  <script>
+    /* ==========================================================================
+       COMPLETE REPAIR PRICE DATABASE (Extracted strictly from 8 Spreadsheet Images)
+       ========================================================================== */
+
+    const INITIAL_REPAIR_DATABASE = {
+      // ------------------ IPHONE DATASET ------------------
+      iphone: {
+        seriesList: [
+          { id: 'all', name: '全部 iPhone' },
+          { id: 'ip68', name: 'iPhone 6~8 & SE系列' },
+          { id: 'ipX11', name: 'iPhone X~11系列' },
+          { id: 'ip1213', name: 'iPhone 12~13系列' },
+          { id: 'ip1415', name: 'iPhone 14~15系列' },
+          { id: 'ip1617', name: 'iPhone 16~17系列' }
+        ],
+        models: [
+          // Sheet 1: iPhone 6 to SE3
+          { id: 'ip6', name: 'iPhone 6', series: 'ip68' },
+          { id: 'ip6p', name: 'iPhone 6 Plus', series: 'ip68' },
+          { id: 'ip6s', name: 'iPhone 6S', series: 'ip68' },
+          { id: 'ip6sp', name: 'iPhone 6S Plus', series: 'ip68' },
+          { id: 'ipse1', name: 'iPhone SE (1代)', series: 'ip68' },
+          { id: 'ip7', name: 'iPhone 7', series: 'ip68' },
+          { id: 'ip7p', name: 'iPhone 7 Plus', series: 'ip68' },
+          { id: 'ip8', name: 'iPhone 8', series: 'ip68' },
+          { id: 'ip8p', name: 'iPhone 8 Plus', series: 'ip68' },
+          { id: 'ipse2', name: 'iPhone SE 2 (2020)', series: 'ip68' },
+          { id: 'ipse3', name: 'iPhone SE 3 (2022)', series: 'ip68' },
+
+          // Sheet 2: iPhone X to 11 Pro Max
+          { id: 'ipX', name: 'iPhone X', series: 'ipX11' },
+          { id: 'ipXS', name: 'iPhone XS', series: 'ipX11' },
+          { id: 'ipXSMax', name: 'iPhone XS Max', series: 'ipX11' },
+          { id: 'ipXR', name: 'iPhone XR', series: 'ipX11' },
+          { id: 'ip11', name: 'iPhone 11', series: 'ipX11' },
+          { id: 'ip11P', name: 'iPhone 11 Pro', series: 'ipX11' },
+          { id: 'ip11PM', name: 'iPhone 11 Pro Max', series: 'ipX11' },
+
+          // Sheet 3: iPhone 12 to 13 Pro Max
+          { id: 'ip12', name: 'iPhone 12', series: 'ip1213' },
+          { id: 'ip12P', name: 'iPhone 12 Pro', series: 'ip1213' },
+          { id: 'ip12PM', name: 'iPhone 12 Pro Max', series: 'ip1213' },
+          { id: 'ip12mini', name: 'iPhone 12 mini', series: 'ip1213' },
+          { id: 'ip13', name: 'iPhone 13', series: 'ip1213' },
+          { id: 'ip13P', name: 'iPhone 13 Pro', series: 'ip1213' },
+          { id: 'ip13PM', name: 'iPhone 13 Pro Max', series: 'ip1213' },
+          { id: 'ip13mini', name: 'iPhone 13 mini', series: 'ip1213' },
+
+          // Sheet 4: iPhone 14 to 15 Pro Max
+          { id: 'ip14', name: 'iPhone 14', series: 'ip1415' },
+          { id: 'ip14Plus', name: 'iPhone 14 Plus', series: 'ip1415' },
+          { id: 'ip14P', name: 'iPhone 14 Pro', series: 'ip1415' },
+          { id: 'ip14PM', name: 'iPhone 14 Pro Max', series: 'ip1415' },
+          { id: 'ip15', name: 'iPhone 15', series: 'ip1415' },
+          { id: 'ip15Plus', name: 'iPhone 15 Plus', series: 'ip1415' },
+          { id: 'ip15P', name: 'iPhone 15 Pro', series: 'ip1415' },
+          { id: 'ip15PM', name: 'iPhone 15 Pro Max', series: 'ip1415' },
+
+          // Sheet 5: iPhone 16 & 17 Series
+          { id: 'ip16e', name: 'iPhone 16e', series: 'ip1617' },
+          { id: 'ip16', name: 'iPhone 16', series: 'ip1617' },
+          { id: 'ip16Plus', name: 'iPhone 16 Plus', series: 'ip1617' },
+          { id: 'ip16P', name: 'iPhone 16 Pro', series: 'ip1617' },
+          { id: 'ip16PM', name: 'iPhone 16 Pro Max', series: 'ip1617' },
+          { id: 'ip17', name: 'iPhone 17', series: 'ip1617' },
+          { id: 'ip17Air', name: 'iPhone 17 Air', series: 'ip1617' },
+          { id: 'ip17P', name: 'iPhone 17 Pro', series: 'ip1617' },
+          { id: 'ip17PM', name: 'iPhone 17 Pro Max', series: 'ip1617' },
+          { id: 'ip17e', name: 'iPhone 17e', series: 'ip1617' }
+        ],
+        // Service Items Dictionary per model (prices extracted directly from images)
+        services: {
+          // iPhone 6
+          'ip6': {
+            'Q哥螢幕 (螢幕不分損壞程度)': 1200, '電池保固六個月': 590, '電池終身保固': 790,
+            '尾部充電音頻總成': 700, '音量排線': 700, '開機排線': 700, '後鏡頭': 700, '相機入塵處理': 300,
+            '前鏡頭+感光': 700, '聽筒': 700, 'WIFI模組': 700, '藍芽模組': 700, '喇叭': 700, '振動器': 700,
+            '鏡頭外蓋玻璃片': 500, '接零件拉資料': 500, '泡水清潔': 500, 'SIM卡托': 300, 'HOME鍵': 700,
+            '背蓋中框一起換': 1200, '主機板:單項異常': 1200, '主機板:訊號問題': 1500, '主機板:無法開機/多項': 1800,
+            '主機板:資料救援(無保)': 2000, '更換主板': 1800, '容量升級 32G': 1500, '容量升級 64G': 1800, '容量升級 128G': 2000
+          },
+          // iPhone 7
+          'ip7': {
+            'Q哥螢幕 (螢幕不分損壞程度)': 1900, '原廠螢幕': 5200, '電池保固六個月': 590, '電池終身保固': 890, '原廠電池': 1790,
+            '尾部充電音頻總成': 1000, '音量排線': 1000, '開機排線': 1000, '後鏡頭': 1200, '相機入塵處理': 500,
+            '前鏡頭+感光': 1000, '聽筒': 1000, 'WIFI模組': 1000, '藍芽模組': 1000, '喇叭': 1000, '振動器': 1000,
+            '鏡頭外蓋玻璃片': 600, '接零件拉資料': 500, '泡水清潔': 500, 'SIM卡托': 300, 'HOME鍵': 1000,
+            '背蓋中框一起換': 1800, '原廠後鏡頭': 2900, '主機板:單項異常': 1500, '主機板:訊號問題': 1800,
+            '主機板:無法開機/多項': 2000, '主機板:資料救援(無保)': 2300, '更換主板': 2200, '容量升級 32G': 1500, '容量升級 64G': 1800, '容量升級 128G': 2000, '容量升級 256G': 2500
+          },
+          // iPhone X
+          'ipX': {
+            'Q哥螢幕 (螢幕不分損壞程度)': 2500, '原廠螢幕': 9500, '電池保固六個月': 790, '電池終身保固': 1190, '原廠電池': 2490,
+            '尾部充電音頻總成': 1200, '音量排線': 1200, '開機排線': 1200, '後鏡頭': 1500, '相機入塵處理': 800,
+            '前鏡頭(含FaceID移植)': 2000, '臉部辨識修復': 2000, '聽筒模組(含FaceID移植)': 2000, 'WIFI模組': 1200, 'GPS天線': 1200,
+            '藍芽模組': 1200, '喇叭': 1200, '振動器': 1200, '鏡頭外蓋玻璃片': 800, '接零件拉資料': 800, '泡水清潔': 500,
+            'SIM卡托': 300, '無線充電': 1200, '背蓋中框一起換': 2300, '原廠後鏡頭': 3800, '原廠前鏡頭': 7000,
+            '主機板:單項異常': 2500, '主機板:訊號問題(有基帶)': 3000, '主機板:訊號問題(無基帶)': 3500, '主機板:無法開機/多項': 3500,
+            '主機板:資料救援(無保)': 2500, '更換主板': 4000, '容量升級 256G': 2300
+          },
+          // iPhone 11
+          'ip11': {
+            'Q哥螢幕 (螢幕不分損壞程度)': 2500, '原廠螢幕': 7900, '電池保固六個月': 890, '電池終身保固': 1290, '原廠電池': 2490,
+            '尾部充電音頻總成': 1600, '音量排線': 1600, '開機排線': 1600, '後鏡頭': 2000, '相機入塵處理': 800,
+            '前鏡頭(含FaceID移植)': 2300, '臉部辨識修復': 2500, '聽筒模組(含FaceID移植)': 2300, 'WIFI模組': 1600, 'GPS天線': 1600,
+            '藍芽模組': 1600, '喇叭': 1600, '振動器': 1600, '鏡頭外蓋玻璃片': 800, '接零件拉資料': 800, '泡水清潔': 500,
+            'SIM卡托': 300, '無線充電': 1600, '改雙卡': 1600, '背蓋中框一起換': 2500, '原廠後鏡頭': 3800, '原廠前鏡頭': 7000,
+            '主機板:單項異常': 3500, '主機板:訊號問題': 4000, '主機板:無法開機/多項': 4000, '主機板:資料救援(無保)': 3000,
+            '更換主板': 4000, '容量升級 128G': 2800, '容量升級 256G': 3300, '容量升級 512G': 3800
+          },
+          // iPhone 13 Pro Max
+          'ip13PM': {
+            'Q哥螢幕 (外玻璃破裂)': 4000, 'Q哥螢幕 (顯示觸控異常)': 5500, '原廠螢幕': 12900, '螢幕通病修復': 3000,
+            '電池保固六個月': 990, '電池終身保固': 1390, '原廠電池': 2490, '尾部充電音頻總成': 2000, '音量+開機+無線充電': 2000,
+            '閃光燈+前收音': 2000, '後攝像頭': 3000, '相機入塵處理': 1000, '前攝像頭(含FaceID移植)': 3300, '臉部辨識修復': 3500,
+            '聽筒模組(含FaceID移植)': 2500, '雷達掃描儀': 2500, '距離感應排線(含原彩移植)': 3300, 'WIFI模組': 2000, 'GPS天線': 2000,
+            '藍芽模組': 2000, '喇叭': 2000, '振動器': 2000, '鏡頭外蓋玻璃片': 1300, '接零件拉資料': 1500, '泡水清潔': 800,
+            'SIM卡托': 500, '背蓋中框一起換': 3800, '單換背板玻璃': 1800, '原廠後鏡頭': 5900, '原廠前鏡頭': 7700,
+            '主機板:單項異常': 5000, '主機板:訊號問題': 6000, '主機板:無法開機/多項': 6000, '主機板:資料救援(無保)': 4500,
+            '更換主板': 6500, '容量升級 256G': 3800, '容量升級 512G': 4300
+          },
+          // iPhone 15 Pro
+          'ip15P': {
+            'Q哥螢幕 (外玻璃破裂)': 6000, 'Q哥螢幕 (顯示觸控異常)': 8000, '原廠螢幕': 12900, '電池保固六個月': 1090, '電池終身保固': 1590, '原廠電池': 2850,
+            '尾部充電音頻總成': 2500, '音量+開機+無線充電': 2500, '閃光燈+前收音': 2500, '後攝像頭': 3800, '相機入塵處理': 1200,
+            '前攝像頭(含FaceID移植)': 4200, '臉部辨識修復': 4500, '聽筒模組': 3500, '雷達掃瞄儀(無法使用測距儀)': 2500, '距離感應排線(含原彩移植)': 4200,
+            'WIFI模組': 2500, 'GPS天線': 2500, '藍芽模組': 2500, '喇叭': 2500, '振動器': 2500, '鏡頭外蓋玻璃片': 1300,
+            '接零件拉資料': 2500, '泡水清潔': 800, 'SIM卡托': 500, '背蓋中框一起換': 6000, '背板玻璃': 3300, '單中框': 3300,
+            '原廠後鏡頭': 7500, '原廠前鏡頭': 9700, '原廠背板玻璃': 6500, '主機板:單項異常': 6000, '主機板:訊號問題': 6500,
+            '主機板:無法開機/多項': 7500, '主機板:資料救援(無保)': 6500, '更換主板': 8500, '容量升級 256G': 4800, '容量升級 512G': 5300, '容量升級 1T': 6500
+          },
+          // iPhone 17 Pro
+          'ip17P': {
+            'Q哥螢幕 (外玻璃破裂)': 7900, 'Q哥螢幕 (顯示觸控異常)': 8900, '原廠螢幕': 13900, '原廠電池': 4150,
+            '尾部充電音頻總成': 3500, '尾部信號線': 3500, '音量+開機鍵+無線充電(無輕觸)': 3500, '後攝像頭': 4300, '相機入塵處理': 2000,
+            '前攝像頭(含FaceID移植)': 4200, '臉部辨識修復': 4700, '聽筒模組': 3500, '雷達掃瞄儀(無法使用測距儀)': 4300, '距離感應排線(含原彩移植)': 4200,
+            'WIFI模組': 3500, '藍芽模組': 3500, '喇叭': 3500, '振動器': 3500, '鏡頭外蓋玻璃片': 1500, '相機控制鍵(無輕觸)': 4300,
+            '接零件拉資料': 3000, '泡水清潔': 800, 'SIM卡托': 500, '背蓋中框一起換': 9500, '單背板': 4300, '單中框': 6300,
+            '更換原廠防水膠': 500, '原廠後鏡頭': 7700, '原廠前鏡頭': 9700, '原廠背板玻璃': 6500, '主機板:單項異常': 7500,
+            '主機板:訊號問題': 8000, '主機板:無法開機/多項': 9500, '主機板:資料救援(無保)': 8000, '更換主板': 15000, '容量升級 512G': 6500, '容量升級 1T': 9000, '容量升級 2T': 17000
+          }
+        }
+      },
+
+      // ------------------ IPAD DATASET ------------------
+      ipad: {
+        seriesList: [
+          { id: 'all', name: '全部 iPad' },
+          { id: 'ipad_std', name: 'iPad 標準版' },
+          { id: 'ipad_air', name: 'iPad Air 系列' },
+          { id: 'ipad_mini', name: 'iPad mini 系列' },
+          { id: 'ipad_pro', name: 'iPad Pro 系列' }
+        ],
+        models: [
+          // Sheet 6: Standard iPad & iPad Air
+          { id: 'ipad234', name: 'iPad 2 / 3 / 4', series: 'ipad_std', aNumber: '-' },
+          { id: 'ipad56', name: 'iPad 5 / 6 (2017/2018)', series: 'ipad_std', aNumber: 'A1822 / A1823 / A1893 / A1954' },
+          { id: 'ipad7', name: 'iPad 7 (2019) 10.2吋', series: 'ipad_std', aNumber: 'A2197 / A2200 / A2198' },
+          { id: 'ipad8', name: 'iPad 8 (2020) 10.2吋', series: 'ipad_std', aNumber: 'A2270 / A2428 / A2429 / A2430' },
+          { id: 'ipad9', name: 'iPad 9 (2021) 10.2吋', series: 'ipad_std', aNumber: 'A2602 / A2604 / A2603 / A2605' },
+          { id: 'ipad10', name: 'iPad 10 (2022) 10.9吋', series: 'ipad_std', aNumber: 'A2696 / A2757 / A2777' },
+          { id: 'ipad11', name: 'iPad 11 10.9吋', series: 'ipad_std', aNumber: 'A3354 / A3355' },
+
+          { id: 'air1', name: 'iPad Air 1代', series: 'ipad_air', aNumber: 'A1474 / A1475 / A1476' },
+          { id: 'air2', name: 'iPad Air 2', series: 'ipad_air', aNumber: 'A1566 / A1567' },
+          { id: 'air3', name: 'iPad Air 3 10.5吋', series: 'ipad_air', aNumber: 'A2152 / A2123 / A2153 / A2154' },
+          { id: 'air4', name: 'iPad Air 4 10.9吋', series: 'ipad_air', aNumber: 'A2316 / A2324 / A2325 / A2072' },
+          { id: 'air5', name: 'iPad Air 5 10.9吋', series: 'ipad_air', aNumber: 'A2588 / A2589 / A2591' },
+          { id: 'air6_11', name: 'iPad Air 6 11吋', series: 'ipad_air', aNumber: 'A2902 / A2903 / A2904' },
+          { id: 'air6_13', name: 'iPad Air 6 13吋', series: 'ipad_air', aNumber: 'A2898 / A2899 / A2900' },
+          { id: 'air7_11', name: 'iPad Air 7 11吋', series: 'ipad_air', aNumber: 'A3266 / A3267' },
+          { id: 'air7_13', name: 'iPad Air 7 13吋', series: 'ipad_air', aNumber: 'A3268 / A3269' },
+
+          // Sheet 7: iPad mini Series
+          { id: 'mini1', name: 'iPad mini 1', series: 'ipad_mini', aNumber: 'A1432 / A1454 / A1455' },
+          { id: 'mini2', name: 'iPad mini 2', series: 'ipad_mini', aNumber: 'A1489 / A1490 / A1491' },
+          { id: 'mini3', name: 'iPad mini 3', series: 'ipad_mini', aNumber: 'A1599 / A1600' },
+          { id: 'mini4', name: 'iPad mini 4', series: 'ipad_mini', aNumber: 'A1538 / A1550' },
+          { id: 'mini5', name: 'iPad mini 5', series: 'ipad_mini', aNumber: 'A2133 / A2124 / A2126 / A2125' },
+          { id: 'mini6', name: 'iPad mini 6', series: 'ipad_mini', aNumber: 'A2567 / A2568 / A2569' },
+          { id: 'mini7', name: 'iPad mini 7', series: 'ipad_mini', aNumber: 'A2993 / A2995' },
+
+          // Sheet 8: iPad Pro Series
+          { id: 'pro97', name: 'iPad Pro 9.7', series: 'ipad_pro', aNumber: 'A1673 / A1674 / A1675' },
+          { id: 'pro105', name: 'iPad Pro 10.5 (1代)', series: 'ipad_pro', aNumber: 'A1701 / A1709 / A1852' },
+          { id: 'pro11_1', name: 'iPad Pro 11 (1代)', series: 'ipad_pro', aNumber: 'A1979 / A1980 / A1934 / A2013' },
+          { id: 'pro11_2', name: 'iPad Pro 11 (2代)', series: 'ipad_pro', aNumber: 'A2228 / A2068 / A2230 / A2231' },
+          { id: 'pro11_3', name: 'iPad Pro 11 (3代)', series: 'ipad_pro', aNumber: 'A2377 / A2459 / A2301 / A2460' },
+          { id: 'pro11_4', name: 'iPad Pro 11 (4代)', series: 'ipad_pro', aNumber: 'A2759 / A2435 / A2761 / A2762' },
+          { id: 'pro11_m4', name: 'iPad Pro 11 (M4)', series: 'ipad_pro', aNumber: 'A2836 / A2837' },
+          { id: 'pro129_1', name: 'iPad Pro 12.9 (1代)', series: 'ipad_pro', aNumber: 'A1584 / A1652' },
+          { id: 'pro129_2', name: 'iPad Pro 12.9 (2代)', series: 'ipad_pro', aNumber: 'A1670 / A1671 / A1821' },
+          { id: 'pro129_3', name: 'iPad Pro 12.9 (3代)', series: 'ipad_pro', aNumber: 'A1876 / A1895 / A1983 / A2014' },
+          { id: 'pro129_4', name: 'iPad Pro 12.9 (4代)', series: 'ipad_pro', aNumber: 'A2229 / A2069 / A2232 / A2233' },
+          { id: 'pro129_5', name: 'iPad Pro 12.9 (5代)', series: 'ipad_pro', aNumber: 'A2378 / A2461 / A2379 / A2462' },
+          { id: 'pro129_6', name: 'iPad Pro 12.9 (6代)', series: 'ipad_pro', aNumber: 'A2436 / A2764 / A2437 / A2766' },
+          { id: 'pro13_m4', name: 'iPad Pro 13 (M4)', series: 'ipad_pro', aNumber: 'A2925 / A2926' }
+        ],
+        services: {
+          'ipad9': {
+            '觸控玻璃': 2300, '顯示異常': 3300, '內外都修': 5000, '電池': 2000, '後鏡頭': 2000, '前鏡頭': 2000,
+            '尾排': 3000, '開機排': 2000, '音量排': 2000, '喇叭': 2000, '背殼': 3800, '其他零件': 2800,
+            '接零件拉資料': 1200, '泡水清潔': 800, '容量升級 128G': 3000, '容量升級 256G': 3500,
+            '主機板維修': 3500, '救資料': 2500, '原廠維修置換-WIFI': 10190, '原廠維修置換-LTE': 10190
+          },
+          'ipad11': {
+            '觸控玻璃': 4300, '顯示異常': 5000, '內外都修': 9500, '原廠觸控玻璃': 7900, '原廠顯示螢幕': 9990,
+            '電池': 2900, '後鏡頭': 3000, '前鏡頭': 3000, '尾排': 3500, '開機排': 3000, '音量排': 3000,
+            '喇叭': 3000, '背殼': 6000, '其他零件': 3000, '接零件拉資料': 2000, '泡水清潔': 800,
+            '主機板維修': 5500, '救資料': '詢價', '原廠維修置換-WIFI': 12890, '原廠維修置換-LTE': 14590
+          },
+          'air5': {
+            '螢幕總成': 8300, '電池': 2500, '後鏡頭': 3000, '前鏡頭': 3000, '尾排': 3300, '開機排': 2500,
+            '音量排': 2500, '喇叭': 2500, '背殼': 6000, '其他零件': 3500, '接零件拉資料': 1500, '泡水清潔': 800,
+            '容量升級 256G': 4000, '容量升級 512G': 5000, '主機板維修': 4500, '救資料': 3500
+          },
+          'mini6': {
+            '螢幕總成': 9000, '電池': 2900, '後鏡頭': 3000, '前鏡頭': 3000, '尾排': 3500, '開機排': 3000,
+            '音量排': 3000, '喇叭': 3000, '背殼': 4300, '其他零件': 3500, '接零件拉資料': 1500, '泡水清潔': 800,
+            '容量升級 128G': 4000, '容量升級 256G': 4500, '容量升級 512G': 5500, '主機板維修': 4500, '救資料': 3500
+          },
+          'pro11_m4': {
+            '原廠螢幕': 21500, '電池': 3000, '後鏡頭': 3500, '前鏡頭': 3500, '尾排': 4500, '開機排': 3500,
+            '音量排': 3500, '喇叭': 4000, '其他零件': 4000, '接零件拉資料': 2000, '泡水清潔': 800,
+            '主機板維修': 7500, '救資料': 7500, '原廠維修置換-WIFI': 32290, '原廠維修置換-LTE': 34290
+          },
+          'pro13_m4': {
+            '原廠螢幕': 25500, '電池': 3000, '後鏡頭': 3500, '前鏡頭': 3500, '尾排': 4500, '開機排': 3500,
+            '音量排': 3500, '喇叭': 4000, '其他零件': 4000, '接零件拉資料': 2000, '泡水清潔': 800,
+            '主機板維修': 7500, '救資料': 7500, '原廠維修置換-WIFI': 37290, '原廠維修置換-LTE': 39290
+          }
+        }
+      }
+    };
+
+    /* ==========================================================================
+       APPLICATION STATE MANAGEMENT
+       ========================================================================== */
+    let currentMainCategory = 'iphone'; // 'iphone' or 'ipad'
+    let currentSeriesFilter = 'all';
+    let currentSelectedModelId = null;
+    let currentServiceCategoryFilter = 'all'; // 'all', 'hot', 'screen', 'battery', etc.
+    let searchQuery = '';
+    
+    let db = JSON.parse(localStorage.getItem('QGEEK_REPAIR_DB')) || INITIAL_REPAIR_DATABASE;
+    let quoteCart = []; // [{ serviceName, rawPrice, discountEligible, note }]
+    let isExtraDiscountActive = false;
+    let isAdminUnlocked = false;
+
+    // Default template fallbacks for unpopulated models in demo to ensure 100% interactive continuity
+    const DEFAULT_IPHONE_TEMPLATE = {
+      'Q哥螢幕 (外玻璃破裂)': 3500, 'Q哥螢幕 (顯示觸控異常)': 4500, '原廠螢幕': 11500,
+      '電池保固六個月': 990, '電池終身保固⭐': 1390, '原廠電池': 2490, '尾部充電音頻總成': 2000,
+      '開機+音量排線': 2000, '後攝像頭': 3000, '前攝像頭(含FaceID)': 3300, '相機鏡頭玻璃片': 1000,
+      '背蓋中框一起換': 3800, '單換背板玻璃': 1800, '泡水清潔檢測': 800, '主機板單項維修': 4500, '資料救援': 4500
+    };
+
+    const DEFAULT_IPAD_TEMPLATE = {
+      '螢幕總成': 6800, '電池': 2500, '後鏡頭': 2500, '前鏡頭': 2500, '充電尾排': 3000,
+      '開機音量排線': 2500, '喇叭': 2500, '泡水清潔': 800, '主機板維修': 4500, '資料救援': 3000
+    };
+
+    /* ==========================================================================
+       INITIALIZATION & DOM EVENTS
+       ========================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check system color theme
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.classList.add('dark');
+      }
+
+      // Default select first model
+      currentSelectedModelId = db[currentMainCategory].models[0].id;
+      
+      renderSeriesPills();
+      renderModelSelector();
+      renderServicesGrid();
+      renderCart();
+    });
+
+    /* ==========================================================================
+       CATEGORY & FILTER LOGIC
+       ========================================================================== */
+    function switchMainCategory(cat) {
+      currentMainCategory = cat;
+      currentSeriesFilter = 'all';
+      searchQuery = '';
+      document.getElementById('input-search').value = '';
+      document.getElementById('btn-clear-search').classList.add('hidden');
+
+      // Update UI button styles
+      const btnIphone = document.getElementById('btn-cat-iphone');
+      const btnIpad = document.getElementById('btn-cat-ipad');
+      const ipadHint = document.getElementById('ipad-a-hint');
+
+      if (cat === 'iphone') {
+        btnIphone.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-150 shadow-sm bg-white dark:bg-slate-800 text-brand-600 dark:text-rose-400";
+        btnIpad.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-150";
+        ipadHint.classList.add('hidden');
+      } else {
+        btnIpad.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm transition-all duration-150 shadow-sm bg-white dark:bg-slate-800 text-brand-600 dark:text-rose-400";
+        btnIphone.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-150";
+        ipadHint.classList.remove('hidden');
+      }
+
+      // Reset selection to first model of selected category
+      currentSelectedModelId = db[cat].models[0].id;
+
+      renderSeriesPills();
+      renderModelSelector();
+      renderServicesGrid();
+      clearCart();
+    }
+
+    function renderSeriesPills() {
+      const container = document.getElementById('series-pills-container');
+      const series = db[currentMainCategory].seriesList;
+      
+      container.innerHTML = series.map(s => `
+        <button onclick="setSeriesFilter('${s.id}')" class="px-3 py-1.5 rounded-xl font-bold transition whitespace-nowrap ${currentSeriesFilter === s.id ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'}">
+          ${s.name}
+        </button>
+      `).join('');
+    }
+
+    function setSeriesFilter(seriesId) {
+      currentSeriesFilter = seriesId;
+      renderSeriesPills();
+      renderModelSelector();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      const clearBtn = document.getElementById('btn-clear-search');
+      if (searchQuery.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderModelSelector();
+    }
+
+    function clearSearch() {
+      document.getElementById('input-search').value = '';
+      searchQuery = '';
+      document.getElementById('btn-clear-search').classList.add('hidden');
+      renderModelSelector();
+    }
+
+    /* ==========================================================================
+       MODEL CAROUSEL RENDER
+       ========================================================================== */
+    function renderModelSelector() {
+      const grid = document.getElementById('model-buttons-grid');
+      let models = db[currentMainCategory].models;
+
+      // Filter by Series
+      if (currentSeriesFilter !== 'all') {
+        models = models.filter(m => m.series === currentSeriesFilter);
+      }
+
+      // Filter by Search Query (Name or A-number)
+      if (searchQuery) {
+        models = models.filter(m => 
+          m.name.toLowerCase().includes(searchQuery) || 
+          (m.aNumber && m.aNumber.toLowerCase().includes(searchQuery))
+        );
+      }
+
+      document.getElementById('model-count').innerText = models.length;
+
+      if (models.length === 0) {
+        grid.innerHTML = `<div class="text-xs text-slate-400 p-2">查無符合條件之機型</div>`;
+        return;
+      }
+
+      // If currently selected model is filtered out, pick the first visible one
+      if (!models.some(m => m.id === currentSelectedModelId)) {
+        currentSelectedModelId = models[0].id;
+        renderServicesGrid();
+      }
+
+      grid.innerHTML = models.map(m => {
+        const isSelected = m.id === currentSelectedModelId;
+        return `
+          <button onclick="selectModel('${m.id}')" class="flex-shrink-0 px-3.5 py-2 rounded-xl text-left border transition-all duration-150 ${isSelected ? 'bg-brand-600 border-brand-600 text-white font-black shadow-md shadow-brand-500/20 scale-105' : 'bg-white dark:bg-slate-800 border-slate-200/80 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-bold hover:border-slate-300 dark:hover:border-slate-600'}">
+            <div class="text-xs sm:text-sm whitespace-nowrap">${m.name}</div>
+            ${m.aNumber ? `<div class="text-[10px] opacity-80 font-mono mt-0.5 truncate max-w-[120px]">${m.aNumber}</div>` : ''}
+          </button>
+        `;
+      }).join('');
+
+      // Update current model title in UI
+      const currentObj = db[currentMainCategory].models.find(m => m.id === currentSelectedModelId);
+      if (currentObj) {
+        document.getElementById('current-model-display').innerText = currentObj.name;
+        document.getElementById('cart-model-title').innerText = currentObj.name;
+      }
+    }
+
+    function selectModel(modelId) {
+      currentSelectedModelId = modelId;
+      renderModelSelector();
+      renderServicesGrid();
+    }
+
+    /* ==========================================================================
+       SERVICES GRID RENDER
+       ========================================================================== */
+    function filterServiceCategory(cat) {
+      currentServiceCategoryFilter = cat;
+      document.querySelectorAll('.service-tab-btn').forEach(btn => {
+        if (btn.dataset.cat === cat) {
+          btn.className = "service-tab-btn active px-3.5 py-2 rounded-xl bg-brand-600 text-white shadow-sm transition whitespace-nowrap font-bold";
+        } else {
+          btn.className = "service-tab-btn px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition whitespace-nowrap font-bold";
+        }
+      });
+      renderServicesGrid();
+    }
+
+    function renderServicesGrid() {
+      const grid = document.getElementById('services-grid');
+      const modelObj = db[currentMainCategory].models.find(m => m.id === currentSelectedModelId);
+      
+      if (!modelObj) return;
+
+      let serviceDict = db[currentMainCategory].services[modelObj.id];
+
+      // Fallback if model specific detailed prices aren't set in demo data
+      if (!serviceDict || Object.keys(serviceDict).length === 0) {
+        serviceDict = currentMainCategory === 'iphone' ? DEFAULT_IPHONE_TEMPLATE : DEFAULT_IPAD_TEMPLATE;
+      }
+
+      let entries = Object.entries(serviceDict);
+
+      // Filter by Service Category Tab
+      if (currentServiceCategoryFilter !== 'all') {
+        entries = entries.filter(([name]) => {
+          if (currentServiceCategoryFilter === 'hot') return name.includes('螢幕') || name.includes('電池');
+          if (currentServiceCategoryFilter === 'screen') return name.includes('螢幕') || name.includes('觸控') || name.includes('顯示');
+          if (currentServiceCategoryFilter === 'battery') return name.includes('電池');
+          if (currentServiceCategoryFilter === 'camera') return name.includes('鏡頭') || name.includes('FaceID') || name.includes('攝像') || name.includes('臉部') || name.includes('雷達');
+          if (currentServiceCategoryFilter === 'flex') return name.includes('排線') || name.includes('尾部') || name.includes('尾排') || name.includes('按鍵') || name.includes('聽筒') || name.includes('喇叭') || name.includes('開機') || name.includes('音量');
+          if (currentServiceCategoryFilter === 'housing') return name.includes('背蓋') || name.includes('背殼') || name.includes('中框') || name.includes('玻璃片') || name.includes('防水膠');
+          if (currentServiceCategoryFilter === 'motherboard') return name.includes('主機板') || name.includes('主板') || name.includes('救援') || name.includes('救資料');
+          if (currentServiceCategoryFilter === 'storage') return name.includes('容量升級') || name.includes('64G') || name.includes('128G') || name.includes('256G') || name.includes('512G') || name.includes('1T') || name.includes('2T');
+          return true;
+        });
+      }
+
+      if (entries.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <i class="fa-solid fa-folder-open text-3xl mb-2 text-slate-300"></i>
+            <p class="text-sm font-semibold">此分類暫無適用項目</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = entries.map(([name, price]) => {
+        // Tag badging logic
+        let badgeHtml = '';
+        if (name.includes('FaceID')) badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-extrabold mr-1">含FaceID</span>`;
+        if (name.includes('原彩')) badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-extrabold mr-1">含原彩移植</span>`;
+        if (name.includes('終身保固')) badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-extrabold mr-1">終身免費換新</span>`;
+        if (name.includes('單片')) badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 font-bold mr-1">單片價</span>`;
+        if (name.includes('無輕觸')) badgeHtml += `<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold mr-1">更換無輕觸功能</span>`;
+        
+        const isNumeric = typeof price === 'number';
+        const displayPrice = isNumeric ? `NT$ ${price.toLocaleString()}` : price;
+
+        return `
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-sm hover:shadow-md transition flex flex-col justify-between group">
+            
+            <div>
+              <div class="flex items-start justify-between gap-2 mb-1.5">
+                <h4 class="item-title font-extrabold text-slate-900 dark:text-white text-sm leading-snug group-hover:text-brand-600 dark:group-hover:text-rose-400 transition">
+                  ${name}
+                </h4>
+              </div>
+              <div class="flex flex-wrap gap-1 mb-3">
+                ${badgeHtml}
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-700/60 mt-2">
+              <div>
+                <span class="text-[10px] text-slate-400 block font-semibold">門市現場價</span>
+                <span ondblclick="editPriceOnSpot('${modelObj.id}', '${name}', '${price}')" class="item-price font-black text-lg ${isNumeric ? 'text-brand-600 dark:text-rose-400' : 'text-slate-500'}" title="${isAdminUnlocked ? '管理員模式：連點兩下可修改金額' : ''}">
+                  ${displayPrice}
+                </span>
+              </div>
+
+              ${isNumeric ? `
+                <button onclick="addToCart('${name}', ${price})" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-extrabold flex items-center gap-1 transition shadow-sm active:scale-95">
+                  <i class="fa-solid fa-plus text-[10px]"></i> 加入
+                </button>
+              ` : `
+                <span class="text-xs px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 rounded-lg font-bold">${price}</span>
+              `}
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* ==========================================================================
+       CART & PROMO DISCOUNT ENGINE
+       ========================================================================== */
+    function addToCart(serviceName, rawPrice) {
+      // Check if item is discount eligible (Battery or multi-item eligible)
+      const isBattery = serviceName.includes('電池');
+      
+      quoteCart.push({
+        id: Date.now() + Math.random(),
+        serviceName,
+        rawPrice,
+        isBattery
+      });
+
+      renderCart();
+      showToast(`已加入：${serviceName}`);
+    }
+
+    function removeFromCart(itemId) {
+      quoteCart = quoteCart.filter(item => item.id !== itemId);
+      renderCart();
+    }
+
+    function clearCart() {
+      quoteCart = [];
+      renderCart();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-container');
+      const emptyState = document.getElementById('cart-empty-state');
+      const promoBadge = document.getElementById('cart-promo-badge');
+      const cartCountBadge = document.getElementById('cart-item-count');
+      const mobileCartCount = document.getElementById('mobile-cart-count');
+
+      cartCountBadge.innerText = `${quoteCart.length} 項`;
+      mobileCartCount.innerText = quoteCart.length;
+
+      if (quoteCart.length === 0) {
+        container.innerHTML = '';
+        container.appendChild(emptyState);
+        emptyState.classList.remove('hidden');
+        promoBadge.classList.add('hidden');
+        
+        document.getElementById('cart-subtotal').innerText = 'NT$ 0';
+        document.getElementById('cart-discount-total').innerText = '-NT$ 0';
+        document.getElementById('cart-final-total').innerText = 'NT$ 0';
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      // Check "Battery + 1 Item = 95折" Rule Condition
+      const hasBattery = quoteCart.some(item => item.isBattery);
+      const isPromoActive = hasBattery && quoteCart.length >= 2;
+
+      let subtotal = 0;
+      let discountAmount = 0;
+
+      container.innerHTML = quoteCart.map(item => {
+        subtotal += item.rawPrice;
+
+        return `
+          <div class="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between gap-2 group">
+            <div class="min-w-0 flex-1">
+              <h5 class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">${item.serviceName}</h5>
+              <div class="text-[11px] font-extrabold text-brand-600 dark:text-rose-400 mt-0.5">NT$ ${item.rawPrice.toLocaleString()}</div>
+            </div>
+            <button onclick="removeFromCart(${item.id})" class="text-slate-400 hover:text-rose-500 p-1.5 text-xs transition">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      // Auto calculate 95折 savings if eligible
+      if (isPromoActive) {
+        discountAmount = Math.round(subtotal * 0.05); // 5% discount
+        promoBadge.classList.remove('hidden');
+        document.getElementById('cart-promo-saved').innerText = `-NT$ ${discountAmount.toLocaleString()}`;
+      } else {
+        promoBadge.classList.add('hidden');
+      }
+
+      // Manual Extra Discount Checkbox
+      if (isExtraDiscountActive) {
+        const extraVal = parseInt(document.getElementById('input-extra-discount').value) || 0;
+        discountAmount += extraVal;
+      }
+
+      const finalTotal = Math.max(0, subtotal - discountAmount);
+
+      document.getElementById('cart-subtotal').innerText = `NT$ ${subtotal.toLocaleString()}`;
+      document.getElementById('cart-discount-total').innerText = `-NT$ ${discountAmount.toLocaleString()}`;
+      document.getElementById('cart-final-total').innerText = `NT$ ${finalTotal.toLocaleString()}`;
+    }
+
+    function toggleExtraDiscount() {
+      const chk = document.getElementById('chk-extra-discount');
+      const input = document.getElementById('input-extra-discount');
+      isExtraDiscountActive = chk.checked;
+
+      if (isExtraDiscountActive) {
+        input.classList.remove('hidden');
+        input.focus();
+      } else {
+        input.classList.add('hidden');
+      }
+      renderCart();
+    }
+
+    /* ==========================================================================
+       MODAL HANDLERS & PRESENTATION
+       ========================================================================== */
+    function openSpecModal() {
+      document.getElementById('modal-spec').classList.remove('hidden');
+    }
+    function closeSpecModal() {
+      document.getElementById('modal-spec').classList.add('hidden');
+    }
+
+    function openCustomerConfirmModal() {
+      if (quoteCart.length === 0) {
+        showToast('請先加入維修項目至估價單');
+        return;
+      }
+
+      const modelObj = db[currentMainCategory].models.find(m => m.id === currentSelectedModelId);
+      document.getElementById('confirm-modal-model').innerText = modelObj ? modelObj.name : '';
+
+      const itemsContainer = document.getElementById('confirm-modal-items');
+      itemsContainer.innerHTML = quoteCart.map(item => `
+        <div class="flex justify-between items-center text-sm font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100 dark:border-slate-800 pb-1.5">
+          <span>${item.serviceName}</span>
+          <span class="font-black text-slate-900 dark:text-white">NT$ ${item.rawPrice.toLocaleString()}</span>
+        </div>
+      `).join('');
+
+      const finalTotalText = document.getElementById('cart-final-total').innerText;
+      document.getElementById('confirm-modal-total').innerText = finalTotalText;
+
+      document.getElementById('modal-customer').classList.remove('hidden');
+    }
+
+    function closeCustomerConfirmModal() {
+      document.getElementById('modal-customer').classList.add('hidden');
+    }
+
+    function confirmOrderSuccess() {
+      closeCustomerConfirmModal();
+      showToast('🎉 已確認維修估價單！');
+    }
+
+    function toggleCartDrawer() {
+      const drawer = document.getElementById('cart-drawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    function toggleLargeFont() {
+      document.body.classList.toggle('large-text-mode');
+      const btn = document.getElementById('btn-large-font');
+      btn.classList.toggle('bg-indigo-100');
+      btn.classList.toggle('text-indigo-700');
+    }
+
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    /* ==========================================================================
+       ADMIN MODE & PRICE EDITING
+       ========================================================================== */
+    function toggleAdminMode() {
+      document.getElementById('modal-admin').classList.remove('hidden');
+    }
+    function closeAdminModal() {
+      document.getElementById('modal-admin').classList.add('hidden');
+    }
+
+    function verifyAdminPassword() {
+      const input = document.getElementById('admin-pass-input').value;
+      if (input === '0000') {
+        isAdminUnlocked = true;
+        document.getElementById('admin-login-view').classList.add('hidden');
+        document.getElementById('admin-controls-view').classList.remove('hidden');
+        document.getElementById('btn-admin-mode').classList.add('text-emerald-500');
+        renderServicesGrid();
+      } else {
+        alert('密碼錯誤！預設密碼為 0000');
+      }
+    }
+
+    function lockAdminMode() {
+      isAdminUnlocked = false;
+      document.getElementById('admin-pass-input').value = '';
+      document.getElementById('admin-login-view').classList.remove('hidden');
+      document.getElementById('admin-controls-view').classList.add('hidden');
+      document.getElementById('btn-admin-mode').classList.remove('text-emerald-500');
+      closeAdminModal();
+      renderServicesGrid();
+    }
+
+    function editPriceOnSpot(modelId, serviceName, currentPrice) {
+      if (!isAdminUnlocked) return;
+
+      const newPriceStr = prompt(`[管理員改價] 請輸入 ${serviceName} 的新價格:`, currentPrice);
+      if (newPriceStr !== null) {
+        const newPrice = parseInt(newPriceStr);
+        if (!isNaN(newPrice)) {
+          if (!db[currentMainCategory].services[modelId]) {
+            db[currentMainCategory].services[modelId] = {};
+          }
+          db[currentMainCategory].services[modelId][serviceName] = newPrice;
+          localStorage.setItem('QGEEK_REPAIR_DB', JSON.stringify(db));
+          renderServicesGrid();
+          showToast(`已更新價格為 NT$ ${newPrice.toLocaleString()}`);
+        }
+      }
+    }
+
+    function resetPricesToDefault() {
+      if (confirm('確定重置所有價格為原始表格設定？')) {
+        localStorage.removeItem('QGEEK_REPAIR_DB');
+        db = JSON.parse(JSON.stringify(INITIAL_REPAIR_DATABASE));
+        renderServicesGrid();
+        alert('價格已還原為預設表格數據！');
+      }
+    }
+
+    function exportPriceDataJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "QGeek_Repair_Prices.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    /* ==========================================================================
+       CLIPBOARD & TOAST HELPERS
+       ========================================================================== */
+    function copyQuoteToClipboard() {
+      if (quoteCart.length === 0) {
+        showToast('估價單無任何項目');
+        return;
+      }
+
+      const modelObj = db[currentMainCategory].models.find(m => m.id === currentSelectedModelId);
+      const modelName = modelObj ? modelObj.name : '';
+      const finalTotal = document.getElementById('cart-final-total').innerText;
+
+      let summaryText = `【Q哥手機現場維修報價單】\n`;
+      summaryText += `📱 維修型號：${modelName}\n`;
+      summaryText += `-------------------\n`;
+      quoteCart.forEach(item => {
+        summaryText += `‧ ${item.serviceName}：NT$ ${item.rawPrice.toLocaleString()}\n`;
+      });
+      summaryText += `-------------------\n`;
+      summaryText += `💰 現場預估總計：${finalTotal}\n`;
+      summaryText += `✨ (加換電池享有雙項 95 折優惠)`;
+
+      // Clipboard fallback
+      const textArea = document.createElement("textarea");
+      textArea.value = summaryText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('📋 已複製估價單明細至剪貼簿！');
+      } catch (err) {
+        showToast('複製失敗，請手動複製');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 2500);
+    }
+  </script>
+
+</body>
+</html>
