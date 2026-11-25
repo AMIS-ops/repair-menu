@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Q哥現場維修報價系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"PingFang TC"', '"Microsoft JhengHei"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body {
+      height: 100%;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tap-active:active {
+      transform: scale(0.97);
+      transition: transform 0.08s ease;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.4);
+      border-radius: 9999px;
+    }
+    .large-mode {
+      font-size: 112%;
+    }
+    .large-mode .price-text {
+      font-size: 1.45rem !important;
+    }
+    .large-mode .item-title {
+      font-size: 1.15rem !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 h-[100dvh] flex flex-col overflow-hidden select-none transition-colors duration-200">
+
+  <!-- Top Header -->
+  <header class="shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-4 py-2 flex items-center justify-between gap-2 z-20 shadow-sm">
+    <div class="flex items-center gap-2.5 min-w-0">
+      <div class="w-9 h-9 rounded-xl bg-brand-600 text-white font-black text-lg flex items-center justify-center shadow-md shadow-brand-500/20 shrink-0">
+        Q
+      </div>
+      <div class="min-w-0 hidden xl:block">
+        <div class="flex items-center gap-2">
+          <h1 class="font-bold text-base truncate">Q哥現場維修報價系統</h1>
+          <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-300 shrink-0">全品項門市版</span>
+        </div>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">同機多項階梯折扣 · 原副廠對照 · 一鍵複製報價</p>
+      </div>
+    </div>
+
+    <!-- Category Switcher -->
+    <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl overflow-x-auto no-scrollbar gap-1">
+      <button id="tab-iphone" data-cat="iphone" class="cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-white shadow-sm shrink-0">
+        📱 iPhone
+      </button>
+      <button id="tab-ipad" data-cat="ipad" class="cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0">
+        📟 iPad
+      </button>
+      <button id="tab-airpods" data-cat="airpods" class="cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0">
+        🎧 AirPods
+      </button>
+      <button id="tab-watch" data-cat="watch" class="cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0">
+        ⌚ Watch
+      </button>
+      <button id="tab-switch" data-cat="switch" class="cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0">
+        🎮 Switch
+      </button>
+      <button id="tab-windows" data-cat="windows" class="cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0">
+        💻 Windows筆電
+      </button>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-1.5 shrink-0">
+      <button id="btn-open-specs" class="tap-active hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/50 text-xs font-bold">
+        <span>ℹ️ 折扣與保固說明</span>
+      </button>
+      <button id="btn-large-text" class="tap-active px-2.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700">
+        A 大字
+      </button>
+      <button id="btn-dark-mode" class="tap-active p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700" title="深淺色切換">
+        <span id="theme-icon">🌙</span>
+      </button>
+      <button id="btn-admin" class="tap-active p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700" title="後台管理模式">
+        <span id="admin-icon">🔒</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <div class="flex-1 min-h-0 flex flex-col lg:flex-row overflow-hidden">
+
+    <!-- Left Panel: Models & Services -->
+    <main class="flex-1 min-h-0 flex flex-col overflow-hidden bg-slate-50 dark:bg-slate-950">
+
+      <!-- Search & Model Selector Bar -->
+      <div class="shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-2.5 space-y-2">
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+            <input id="search-input" type="text" placeholder="搜尋全站型號或編號 (例如: 15 Pro, Air 5, S10, Ultra, Switch OLED, 筆電)..." class="w-full pl-9 pr-8 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-transparent focus:border-brand-500 focus:bg-white dark:focus:bg-slate-900 text-sm outline-none transition-all" />
+            <button id="clear-search" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+          </div>
+          <div id="admin-banner" class="hidden items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-xs font-bold shrink-0">
+            <span>🛠️ 後台編輯中</span>
+            <button id="btn-export-json" class="underline ml-1">匯出</button>
+            <button id="btn-reset-data" class="underline text-rose-600 ml-1">還原</button>
+          </div>
+        </div>
+
+        <!-- Horizontal Scrollable Model Pills -->
+        <div id="model-pills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5"></div>
+      </div>
+
+      <!-- Service Filter Tabs & Dynamic Promo Banner -->
+      <div class="shrink-0 px-4 pt-2.5 pb-2 space-y-2">
+        <div id="service-filters" class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <button data-filter="all" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-600 text-white shadow-sm shrink-0">
+            ☰ 全部服務項目
+          </button>
+          <button data-filter="hot" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+            🔥 熱門快選
+          </button>
+          <button data-filter="screen" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+            📱 螢幕/觸控
+          </button>
+          <button data-filter="battery" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+            🔋 電池換新
+          </button>
+          <button data-filter="camera" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+            📷 鏡頭/FaceID
+          </button>
+          <button data-filter="parts" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+            🔌 排線/按鍵/外殼
+          </button>
+          <button data-filter="board" class="filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+            🧠 主板/清潔/其他
+          </button>
+        </div>
+
+        <!-- Promo Banner (Auto updates per category) -->
+        <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/50 rounded-xl px-3.5 py-2 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 text-xs min-w-0">
+            <span class="px-2 py-0.5 rounded-md bg-amber-400 text-amber-950 font-black shrink-0">⚡ 折扣規則</span>
+            <span id="category-promo-text" class="font-bold text-amber-900 dark:text-amber-200 truncate">同一支 iPhone 維修：兩項零件 95 折、三項 9 折、四項以上 85 折！</span>
+          </div>
+          <button id="btn-banner-specs" class="text-xs font-bold text-brand-600 dark:text-brand-400 shrink-0 hover:underline">注意事項 &gt;</button>
+        </div>
+      </div>
+
+      <!-- Scrollable Service Grid -->
+      <div id="services-container" class="flex-1 min-h-0 overflow-y-auto custom-scroll px-4 pb-6">
+        <div id="services-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+      </div>
+    </main>
+
+    <!-- Right Panel: Live Quote Cart -->
+    <aside class="w-full lg:w-[370px] xl:w-[400px] shrink-0 bg-white dark:bg-slate-900 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 flex flex-col h-[43dvh] lg:h-full z-10 shadow-xl lg:shadow-none">
+
+      <!-- Cart Header -->
+      <div class="shrink-0 px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-brand-600 text-lg">🧾</span>
+          <h2 class="font-bold text-base">現場維修估價單</h2>
+          <span id="cart-count-badge" class="px-2 py-0.5 rounded-full bg-brand-600 text-white text-xs font-bold">0 項</span>
+        </div>
+        <button id="btn-clear-cart" class="tap-active px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
+          🗑️ 清空
+        </button>
+      </div>
+
+      <!-- Current Device Info Bar -->
+      <div class="shrink-0 px-4 py-2 bg-rose-50/70 dark:bg-rose-950/20 border-b border-rose-100 dark:border-rose-900/30 flex items-center justify-between">
+        <div class="min-w-0">
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 block">目前檢視型號：</span>
+          <span id="cart-current-model" class="font-black text-sm text-slate-800 dark:text-slate-100 truncate block">iPhone 6</span>
+        </div>
+        <span class="text-[11px] text-slate-400 shrink-0">同機多項自動階梯折抵</span>
+      </div>
+
+      <!-- Scrollable Cart Items List -->
+      <div id="cart-items-list" class="flex-1 min-h-0 overflow-y-auto custom-scroll p-3 space-y-2"></div>
+
+      <!-- Fixed Bottom Checkout Summary -->
+      <div class="shrink-0 p-3.5 bg-slate-50 dark:bg-slate-900/95 border-t border-slate-200 dark:border-slate-800 space-y-2">
+        <div class="space-y-1 text-xs">
+          <div class="flex justify-between text-slate-600 dark:text-slate-400">
+            <span>項目原價總計</span>
+            <span id="summary-subtotal" class="font-bold">NT$ 0</span>
+          </div>
+          <div class="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+            <span id="discount-label">多項組合自動折抵</span>
+            <span id="summary-discount">-NT$ 0</span>
+          </div>
+          <div id="discount-breakdown" class="text-[11px] text-emerald-600/80 dark:text-emerald-400/80 space-y-0.5"></div>
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 cursor-pointer">
+              <input id="manual-discount-toggle" type="checkbox" class="rounded text-brand-600 focus:ring-brand-500" />
+              <span>自訂現場折抵</span>
+            </label>
+            <div id="manual-discount-box" class="hidden flex items-center gap-1">
+              <span class="text-slate-400">-NT$</span>
+              <input id="manual-discount-input" type="number" min="0" step="50" value="0" class="w-20 px-2 py-0.5 text-right rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 font-bold text-xs" />
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex items-end justify-between">
+          <div>
+            <div class="font-bold text-sm">現場估價總計</div>
+            <div class="text-[11px] text-slate-400">含專業工資與零件保固</div>
+          </div>
+          <div id="summary-total" class="text-2xl sm:text-3xl font-black text-brand-600 tracking-tight">
+            NT$ 0
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button id="btn-open-confirm" class="tap-active py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 text-white font-bold text-sm flex items-center justify-center gap-1.5 shadow-sm">
+            <span>📋 客戶確認卡</span>
+          </button>
+          <button id="btn-copy-quote" class="tap-active py-2.5 px-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm flex items-center justify-center gap-1.5 shadow-sm shadow-brand-500/20">
+            <span>📄 複製明細</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Customer Confirmation Fullscreen Modal -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[90dvh]">
+      <div class="bg-brand-600 text-white px-6 py-4 flex items-center justify-between">
+        <div>
+          <span class="text-xs font-bold opacity-85 uppercase tracking-wider">Q哥專業維修中心</span>
+          <h3 class="text-xl font-black">現場維修報價確認單</h3>
+        </div>
+        <button data-close-modal="confirm-modal" class="modal-close-btn w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div id="confirm-modal-body" class="p-6 overflow-y-auto space-y-4 flex-1"></div>
+      <div class="p-4 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-200 dark:border-slate-800 flex gap-3">
+        <button data-close-modal="confirm-modal" class="modal-close-btn flex-1 py-3 rounded-xl bg-slate-200 dark:bg-slate-700 font-bold text-sm">返回修改</button>
+        <button id="btn-confirm-and-copy" class="flex-1 py-3 rounded-xl bg-brand-600 text-white font-bold text-sm shadow-lg shadow-brand-500/30">複製明細並完成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specs & Warranty Explanation Modal -->
+  <div id="specs-modal" class="hidden fixed inset-0 z-50 bg-slate-900/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col max-h-[88dvh]">
+      <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="text-lg font-black">📖 全品項多項折扣與維修注意事項</h3>
+        <button data-close-modal="specs-modal" class="modal-close-btn w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div class="p-6 overflow-y-auto space-y-4 text-sm leading-relaxed">
+        <div class="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/40">
+          <h4 class="font-black text-brand-600 mb-1">📱 iPhone & iPad 同機多項階梯優惠</h4>
+          <ul class="list-disc pl-5 space-y-1 text-slate-700 dark:text-slate-300">
+            <li><strong>同一台裝置維修 2 項零件：</strong>該機零件享 <strong>95 折</strong></li>
+            <li><strong>同一台裝置維修 3 項零件：</strong>該機零件享 <strong>9 折</strong></li>
+            <li><strong>同一台裝置維修 4 項（含）以上零件：</strong>該機零件享 <strong>85 折</strong></li>
+            <li>※ 若估價單同時包含兩支不同手機，系統會依「同一型號裝置」各自計算件數與對應折扣（原廠零件與主板維修皆納入多項折扣計算）。</li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <h4 class="font-black text-sky-600 mb-1">⌚ Apple Watch 與 🎧 AirPods 注意事項</h4>
+          <ul class="list-disc pl-5 space-y-1 text-slate-600 dark:text-slate-300">
+            <li><strong>Apple Watch：</strong>維修兩項享 <strong>95 折</strong>。螢幕開掉純黏合 ($500) 與錶帶卡死拆除 ($300) 無提供保固，排線受拉扯可能影響觸控顯示；S1~S6/SE 卡驚嘆號可嘗試刷機 ($500，有死機風險)。</li>
+            <li><strong>AirPods：</strong>充電盒蓋子脫落、本體底部開掉純黏合報價 $300（無保固）；有線充電盒異常建議換新無修理。</li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+          <h4 class="font-black text-red-600 mb-1">🎮 Nintendo Switch 裝置獨立折扣規則</h4>
+          <ul class="list-disc pl-5 space-y-1 text-slate-600 dark:text-slate-300">
+            <li>主機與 Joy-Con 搖桿為各自獨立運作之裝置，<strong>折扣以「單一裝置」為單位計算</strong>：</li>
+            <li>同一台主機有兩項以上維修 ➔ <strong>該主機可打 95 折</strong>。</li>
+            <li>同一支搖桿有兩項以上維修 ➔ <strong>該搖桿可打 95 折</strong>。</li>
+            <li>一台主機 + 一支搖桿（各自只有一項）➔ <strong>不符合 95 折條件</strong>。</li>
+            <li>※ Switch 改機（硬改/軟改）需先告知客人「改機後會有死機風險」，客人同意才收件；更換料件保固 180 天（代工無保固）。</li>
+          </ul>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40">
+          <h4 class="font-black text-amber-800 dark:text-amber-300 mb-1">💻 Windows 筆電與桌機報價須知</h4>
+          <ul class="list-disc pl-5 space-y-1 text-amber-900/85 dark:text-amber-200/85">
+            <li><strong>兩項維修可 95 折</strong>；<strong>任意維修加「深層清潔」可折 $300</strong>（重灌系統不包含在內）。</li>
+            <li>系統顯示之區間價格為「預估金額」，實際價格需收到電腦拆機比對料號（如螢幕面板型號）後致電報價。</li>
+            <li>重灌系統 ($800) 目前僅接筆電（綁定原廠數位授權序號），桌機除非客人自備正版序號否則不接重灌。</li>
+            <li>部分筆電鍵盤為鉚釘一次性封裝，更換後手感可能與原本不同，且目前備料皆為繁體中文（無法換日規筆電）。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-opacity duration-200 bg-slate-900 text-white px-4 py-2.5 rounded-full text-xs font-bold shadow-xl">
+    已複製報價明細！
+  </div>
+
+<script>
+const DEFAULT_DB = {
+  iphone: [
+    {
+      id: 'ip6', name: 'iPhone 6', code: 'A1549/A1586',
+      services: [
+        { name: 'Q哥螢幕', price: 1200, cat: 'screen', hot: true },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 790, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '尾部充電音頻總成', price: 700, cat: 'parts' },
+        { name: '音量排線', price: 700, cat: 'parts' },
+        { name: '開機排線', price: 700, cat: 'parts' },
+        { name: '後鏡頭', price: 700, cat: 'camera' },
+        { name: '相機入塵處理', price: 300, cat: 'camera' },
+        { name: '前鏡頭+感光', price: 700, cat: 'camera' },
+        { name: '聽筒', price: 700, cat: 'parts' },
+        { name: 'WIFI模組', price: 700, cat: 'parts' },
+        { name: '藍芽模組', price: 700, cat: 'parts' },
+        { name: '喇叭', price: 700, cat: 'parts' },
+        { name: '振動器', price: 700, cat: 'parts' },
+        { name: '鏡頭外蓋玻璃片 (單片)', price: 500, cat: 'camera' },
+        { name: '接零件拉資料', price: 500, cat: 'board' },
+        { name: '泡水清潔', price: 500, cat: 'board' },
+        { name: 'SIM卡托', price: 300, cat: 'parts' },
+        { name: 'HOME鍵', price: 700, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 1200, cat: 'parts' },
+        { name: '主機板單項異常 (可進系統/無重啟)', price: 1200, cat: 'board' },
+        { name: '主機板訊號相關問題 (有數據機韌體)', price: 1500, cat: 'board' },
+        { name: '主機板不開機 / 兩項以上異常', price: 1800, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 2000, cat: 'board' },
+        { name: '更換主板', price: 1800, cat: 'board' },
+        { name: '容量升級 32G / 64G / 128G', price: 1500, cat: 'board', note: '32G:$1500 / 64G:$1800 / 128G:$2000' }
+      ]
+    },
+    {
+      id: 'ip6p', name: 'iPhone 6 Plus', code: 'A1522/A1524',
+      services: [
+        { name: 'Q哥螢幕', price: 1200, cat: 'screen', hot: true },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 790, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '尾部充電音頻總成', price: 700, cat: 'parts' },
+        { name: '音量排線 / 開機排線', price: 700, cat: 'parts' },
+        { name: '後鏡頭', price: 700, cat: 'camera' },
+        { name: '前鏡頭+感光', price: 700, cat: 'camera' },
+        { name: '聽筒 / 喇叭 / 振動器 / WIFI', price: 700, cat: 'parts' },
+        { name: '鏡頭外蓋玻璃片 (單片)', price: 500, cat: 'camera' },
+        { name: 'HOME鍵', price: 700, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 1200, cat: 'parts' },
+        { name: '泡水清潔 / 接零件拉資料', price: 500, cat: 'board' },
+        { name: '主機板單項異常', price: 1200, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip6s', name: 'iPhone 6S', code: 'A1633/A1688',
+      services: [
+        { name: 'Q哥螢幕', price: 1200, cat: 'screen', hot: true },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 790, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '尾部充電音頻總成', price: 700, cat: 'parts' },
+        { name: '後鏡頭 / 前鏡頭+感光', price: 700, cat: 'camera' },
+        { name: 'HOME鍵', price: 700, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 1200, cat: 'parts' },
+        { name: '主機板單項異常', price: 1200, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip6sp', name: 'iPhone 6S Plus', code: 'A1634/A1687',
+      services: [
+        { name: 'Q哥螢幕', price: 1500, cat: 'screen', hot: true },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 790, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '尾部充電音頻總成', price: 700, cat: 'parts' },
+        { name: '後鏡頭 / 前鏡頭+感光', price: 700, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 1200, cat: 'parts' },
+        { name: '主機板單項異常', price: 1200, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipse1', name: 'iPhone SE (1代)', code: 'A1662/A1723',
+      services: [
+        { name: 'Q哥螢幕', price: 1200, cat: 'screen', hot: true },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 790, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '尾部充電音頻總成', price: 700, cat: 'parts' },
+        { name: 'HOME鍵', price: 800, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 1200, cat: 'parts' }
+      ]
+    },
+    {
+      id: 'ip7', name: 'iPhone 7', code: 'A1660/A1778',
+      services: [
+        { name: 'Q哥螢幕', price: 1900, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 5200, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 890, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 1790, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1000, cat: 'parts' },
+        { name: '音量排線 / 開機排線', price: 1000, cat: 'parts' },
+        { name: '後鏡頭', price: 1200, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 2900, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭+感光', price: 1000, cat: 'camera' },
+        { name: '鏡頭外蓋玻璃片 (單片)', price: 600, cat: 'camera' },
+        { name: 'HOME鍵', price: 1000, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 1800, cat: 'parts' },
+        { name: '主機板單項異常 (音頻IC等)', price: 1500, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 2300, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip7p', name: 'iPhone 7 Plus', code: 'A1661/A1784',
+      services: [
+        { name: 'Q哥螢幕', price: 2000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 5900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 890, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 1790, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1000, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭+感光', price: 1000, cat: 'camera' },
+        { name: 'HOME鍵', price: 1000, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 2000, cat: 'parts' },
+        { name: '主機板單項異常', price: 1500, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 2300, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip8', name: 'iPhone 8', code: 'A1863/A1905',
+      services: [
+        { name: 'Q哥螢幕', price: 2000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 5200, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 890, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 1790, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1000, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 2900, cat: 'camera', badge: '原廠零件' },
+        { name: '無線充電線圈', price: 1100, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 1800, cat: 'parts' },
+        { name: '主機板單項異常', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip8p', name: 'iPhone 8 Plus', code: 'A1864/A1897',
+      services: [
+        { name: 'Q哥螢幕', price: 2000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 5900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 890, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 1790, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1000, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '無線充電線圈', price: 1100, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 2000, cat: 'parts' },
+        { name: '主機板單項異常', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipse2', name: 'iPhone SE2', code: 'A2275/A2296',
+      services: [
+        { name: 'Q哥螢幕', price: 2000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 5200, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 590, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 890, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 1790, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1000, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3190, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 2000, cat: 'parts' },
+        { name: '主機板單項異常', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipse3', name: 'iPhone SE3', code: 'A2595/A2783',
+      services: [
+        { name: 'Q哥螢幕', price: 2000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 5200, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 690, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 990, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 1790, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1000, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3890, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 2000, cat: 'parts' },
+        { name: '主機板單項異常', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipx', name: 'iPhone X', code: 'A1865/A1901',
+      services: [
+        { name: 'Q哥螢幕', price: 2500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 9500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 790, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1190, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1200, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭 (含FaceID移植)', price: 2000, cat: 'camera' },
+        { name: '臉部辨識修復', price: 2000, cat: 'camera' },
+        { name: '聽筒模組 (含FaceID移植)', price: 2000, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 2300, cat: 'parts' },
+        { name: '主機板單項異常', price: 2500, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipxs', name: 'iPhone XS', code: 'A1920/A2097',
+      services: [
+        { name: 'Q哥螢幕', price: 2500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 9500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 790, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1190, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1200, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭 / 臉部辨識修復', price: 2000, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 2400, cat: 'parts' },
+        { name: '主機板單項異常', price: 3000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipxsm', name: 'iPhone XS Max', code: 'A1921/A2101',
+      services: [
+        { name: 'Q哥螢幕', price: 2700, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 10900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 790, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1190, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1200, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 2400, cat: 'parts' },
+        { name: '主機板單項異常', price: 3000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipxr', name: 'iPhone XR', code: 'A1984/A2105',
+      services: [
+        { name: 'Q哥螢幕', price: 2500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 7500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 790, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1190, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1200, cat: 'parts' },
+        { name: '後鏡頭', price: 1500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '改雙卡', price: 1200, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 2300, cat: 'parts' },
+        { name: '主機板單項異常', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip11', name: 'iPhone 11', code: 'A2111/A2221',
+      services: [
+        { name: 'Q哥螢幕', price: 2500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 7900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1600, cat: 'parts' },
+        { name: '後鏡頭', price: 2000, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 3800, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭 (含FaceID移植)', price: 2300, cat: 'camera' },
+        { name: '臉部辨識修復', price: 2500, cat: 'camera' },
+        { name: '改雙卡', price: 1600, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 2500, cat: 'parts' },
+        { name: '主機板單項異常', price: 3500, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 3000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip11p', name: 'iPhone 11 Pro', code: 'A2160/A2215',
+      services: [
+        { name: 'Q哥螢幕', price: 3000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 10900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1600, cat: 'parts' },
+        { name: '後鏡頭', price: 2300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 4490, cat: 'camera', badge: '原廠零件' },
+        { name: '臉部辨識修復', price: 2500, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 2900, cat: 'parts' },
+        { name: '主機板單項異常', price: 3500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip11pm', name: 'iPhone 11 Pro Max', code: 'A2161/A2218',
+      services: [
+        { name: 'Q哥螢幕', price: 3000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 1600, cat: 'parts' },
+        { name: '後鏡頭', price: 2300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 4490, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 2900, cat: 'parts' },
+        { name: '主機板單項異常', price: 3500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip12', name: 'iPhone 12', code: 'A2172/A2403',
+      services: [
+        { name: 'Q哥螢幕', price: 4000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 2300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 4900, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭 (含FaceID移植)', price: 3000, cat: 'camera' },
+        { name: '臉部辨識修復', price: 3300, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 3000, cat: 'parts' },
+        { name: '單換背板玻璃', price: 1500, cat: 'parts', note: '不適用自帶料半價' },
+        { name: '主機板單項異常', price: 4000, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 4000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip12p', name: 'iPhone 12 Pro', code: 'A2341/A2407',
+      services: [
+        { name: 'Q哥螢幕', price: 4000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 3000, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5900, cat: 'camera', badge: '原廠零件' },
+        { name: '雷達掃瞄儀 (LiDAR)', price: 2500, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 3300, cat: 'parts' },
+        { name: '單換背板玻璃', price: 1650, cat: 'parts' },
+        { name: '主機板單項異常', price: 4000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip12pm', name: 'iPhone 12 Pro Max', code: 'A2342/A2411',
+      services: [
+        { name: 'Q哥螢幕', price: 4500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 3000, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5900, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 3300, cat: 'parts' },
+        { name: '單換背板玻璃', price: 1650, cat: 'parts' },
+        { name: '主機板單項異常', price: 4000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip12m', name: 'iPhone 12 mini', code: 'A2176/A2399',
+      services: [
+        { name: 'Q哥螢幕', price: 4000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 9500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 890, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1290, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 2300, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 3000, cat: 'parts' },
+        { name: '主機板單項異常', price: 4000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip13', name: 'iPhone 13', code: 'A2482/A2633',
+      services: [
+        { name: 'Q哥螢幕', price: 4500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 2300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5490, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭 (含FaceID移植)', price: 3300, cat: 'camera' },
+        { name: '臉部辨識修復', price: 3500, cat: 'camera' },
+        { name: '距離感應排線 (含原彩移植)', price: 3300, cat: 'parts' },
+        { name: '背蓋中框一起換', price: 3000, cat: 'parts' },
+        { name: '單換背板玻璃', price: 1500, cat: 'parts' },
+        { name: '主機板單項異常', price: 4500, cat: 'board' },
+        { name: '主板問題資料救援 (無保固)', price: 4500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip13p', name: 'iPhone 13 Pro', code: 'A2483/A2638',
+      services: [
+        { name: 'Q哥螢幕', price: 5500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '螢幕通病修復 (白屏/綠屏)', price: 3000, cat: 'screen', badge: '高CP修復' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 3000, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5900, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 3800, cat: 'parts' },
+        { name: '單換背板玻璃', price: 1800, cat: 'parts' },
+        { name: '主機板單項異常', price: 5000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip13pm', name: 'iPhone 13 Pro Max', code: 'A2484/A2643',
+      services: [
+        { name: 'Q哥螢幕', price: 5500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12900, cat: 'screen', badge: '原廠零件' },
+        { name: '螢幕通病修復 (白屏/綠屏)', price: 3000, cat: 'screen', badge: '高CP修復' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 3000, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5900, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 3800, cat: 'parts' },
+        { name: '單換背板玻璃', price: 1800, cat: 'parts' },
+        { name: '主機板單項異常', price: 5000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip13m', name: 'iPhone 13 mini', code: 'A2481/A2628',
+      services: [
+        { name: 'Q哥螢幕', price: 4500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 9500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2490, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2000, cat: 'parts' },
+        { name: '後鏡頭', price: 2300, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 3000, cat: 'parts' },
+        { name: '主機板單項異常', price: 4500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip14', name: 'iPhone 14', code: 'A2649/A2882',
+      services: [
+        { name: 'Q哥螢幕', price: 5000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 2700, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5490, cat: 'camera', badge: '原廠零件' },
+        { name: '前鏡頭 (含FaceID移植)', price: 4200, cat: 'camera' },
+        { name: '臉部辨識修復', price: 4000, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 5000, cat: 'parts' },
+        { name: '背板玻璃', price: 2500, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 5400, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 4500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip14p_plus', name: 'iPhone 14 Plus', code: 'A2632/A2886',
+      services: [
+        { name: 'Q哥螢幕', price: 5000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 2700, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 5000, cat: 'parts' },
+        { name: '背板玻璃', price: 2500, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 4500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip14pro', name: 'iPhone 14 Pro', code: 'A2650/A2890',
+      services: [
+        { name: 'Q哥螢幕', price: 6500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7000, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 4500, cat: 'parts' },
+        { name: '背板玻璃', price: 1800, cat: 'parts' },
+        { name: '主機板單項異常', price: 5500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip14pm', name: 'iPhone 14 Pro Max', code: 'A2651/A2894',
+      services: [
+        { name: 'Q哥螢幕', price: 7500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 14600, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 990, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1390, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7000, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 4800, cat: 'parts' },
+        { name: '背板玻璃', price: 1800, cat: 'parts' },
+        { name: '主機板單項異常', price: 5500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip15', name: 'iPhone 15', code: 'A2846/A3090',
+      services: [
+        { name: 'Q哥螢幕', price: 6000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1090, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1590, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 2700, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 6000, cat: 'parts' },
+        { name: '背板玻璃', price: 3000, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip15plus', name: 'iPhone 15 Plus', code: 'A2847/A3094',
+      services: [
+        { name: 'Q哥螢幕', price: 6000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1090, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1590, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 2700, cat: 'camera' },
+        { name: '背蓋中框一起換', price: 6000, cat: 'parts' },
+        { name: '背板玻璃', price: 3000, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 7500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip15pro', name: 'iPhone 15 Pro', code: 'A2848/A3102',
+      services: [
+        { name: 'Q哥螢幕', price: 8000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 12900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1090, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1590, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 6000, cat: 'parts' },
+        { name: '背板玻璃', price: 3300, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip15pm', name: 'iPhone 15 Pro Max', code: 'A2849/A3106',
+      services: [
+        { name: 'Q哥螢幕', price: 8500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 14600, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1090, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1590, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 2500, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 6000, cat: 'parts' },
+        { name: '背板玻璃', price: 3300, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 7500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip16e', name: 'iPhone 16e', code: '16e',
+      services: [
+        { name: 'Q哥螢幕', price: 6000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 10200, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1190, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1690, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3000, cat: 'parts' },
+        { name: '後鏡頭', price: 3500, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 4290, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 7000, cat: 'parts' },
+        { name: '單背板', price: 3500, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip16', name: 'iPhone 16', code: 'A3081/A3287',
+      services: [
+        { name: 'Q哥螢幕', price: 6000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1190, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1690, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3000, cat: 'parts' },
+        { name: '相機控制鍵 (更換後無輕觸功能)', price: 3800, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 7000, cat: 'parts' },
+        { name: '單背板', price: 3500, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip16plus', name: 'iPhone 16 Plus', code: 'A3082/A3290',
+      services: [
+        { name: 'Q哥螢幕', price: 6500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1190, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1690, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 2850, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3000, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 7000, cat: 'parts' },
+        { name: '單背板', price: 3500, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6800, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip16pro', name: 'iPhone 16 Pro', code: 'A3083/A3293',
+      services: [
+        { name: 'Q哥螢幕', price: 8000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13900, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1190, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1690, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 3650, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3000, cat: 'parts' },
+        { name: '相機控制鍵', price: 3800, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 8000, cat: 'parts' },
+        { name: '單背板', price: 4000, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip16pm', name: 'iPhone 16 Pro Max', code: 'A3084/A3296',
+      services: [
+        { name: 'Q哥螢幕', price: 9000, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 15300, cat: 'screen', badge: '原廠零件' },
+        { name: '電池保固六個月', price: 1190, cat: 'battery', hot: true },
+        { name: '電池終身保固', price: 1690, cat: 'battery', hot: true, badge: '終身免費換新' },
+        { name: '原廠電池', price: 3650, cat: 'battery', badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3000, cat: 'parts' },
+        { name: '後鏡頭', price: 3800, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 8000, cat: 'parts' },
+        { name: '單背板', price: 4000, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 7500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 6500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip17', name: 'iPhone 17', code: '17',
+      services: [
+        { name: 'Q哥螢幕', price: 6500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13900, cat: 'screen', badge: '原廠零件' },
+        { name: '原廠電池', price: 3350, cat: 'battery', hot: true, badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3500, cat: 'parts' },
+        { name: '後鏡頭', price: 4300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 8600, cat: 'parts' },
+        { name: '單背板', price: 4300, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 7500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip17air', name: 'iPhone 17 Air', code: '17 Air',
+      services: [
+        { name: 'Q哥螢幕', price: 7500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13900, cat: 'screen', badge: '原廠零件' },
+        { name: '原廠電池', price: 4150, cat: 'battery', hot: true, badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3500, cat: 'parts' },
+        { name: '後鏡頭', price: 4300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 5500, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 8600, cat: 'parts' },
+        { name: '單背板', price: 4300, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 7500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip17pro', name: 'iPhone 17 Pro', code: '17 Pro',
+      services: [
+        { name: 'Q哥螢幕', price: 8900, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13900, cat: 'screen', badge: '原廠零件' },
+        { name: '原廠電池', price: 4150, cat: 'battery', hot: true, badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3500, cat: 'parts' },
+        { name: '後鏡頭', price: 4300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7700, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 9500, cat: 'parts' },
+        { name: '單背板', price: 4300, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '更換原廠防水膠', price: 500, cat: 'parts' },
+        { name: '主機板單項異常', price: 7500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip17pm', name: 'iPhone 17 Pro Max', code: '17 Pro Max',
+      services: [
+        { name: 'Q哥螢幕', price: 9900, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 15300, cat: 'screen', badge: '原廠零件' },
+        { name: '原廠電池', price: 4150, cat: 'battery', hot: true, badge: '原廠零件' },
+        { name: '尾部充電音頻總成', price: 3500, cat: 'parts' },
+        { name: '後鏡頭', price: 4300, cat: 'camera' },
+        { name: '原廠後鏡頭', price: 7700, cat: 'camera', badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 9500, cat: 'parts' },
+        { name: '單背板', price: 4300, cat: 'parts' },
+        { name: '原廠背板玻璃', price: 6500, cat: 'parts', badge: '原廠零件' },
+        { name: '主機板單項異常', price: 7500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ip17e', name: 'iPhone 17e', code: '17e',
+      services: [
+        { name: 'Q哥螢幕', price: 6500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 10200, cat: 'screen', badge: '原廠零件' },
+        { name: '原廠電池', price: 2850, cat: 'battery', hot: true, badge: '原廠零件' },
+        { name: '背蓋中框一起換', price: 7000, cat: 'parts' },
+        { name: '單背板', price: 3500, cat: 'parts' },
+        { name: '單中框', price: 4500, cat: 'parts' },
+        { name: '主機板單項異常', price: 7500, cat: 'board' }
+      ]
+    }
+  ],
+
+  ipad: [
+    {
+      id: 'ipad234', name: 'iPad 2 / 3 / 4', code: 'A1395/A1416/A1458',
+      services: [
+        { name: '觸控玻璃', price: 1600, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 1600, cat: 'screen' },
+        { name: '內外都修', price: 3000, cat: 'screen', hot: true },
+        { name: '電池', price: 1600, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 1500, cat: 'camera' },
+        { name: '尾排 / 開機排 / 音量排 / 喇叭', price: 1500, cat: 'parts' },
+        { name: '背殼', price: 2300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipad56', name: 'iPad 5 (2017) / iPad 6 (2018)', code: 'A1822/A1893',
+      services: [
+        { name: '觸控玻璃', price: 1800, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 2300, cat: 'screen' },
+        { name: '內外都修', price: 3500, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 1500, cat: 'camera' },
+        { name: '尾排', price: 2300, cat: 'parts' },
+        { name: '開機排 / 音量排', price: 1500, cat: 'parts' },
+        { name: '喇叭', price: 2000, cat: 'parts' },
+        { name: '背殼', price: 2800, cat: 'parts' },
+        { name: '主機板維修', price: 2500, cat: 'board' },
+        { name: '救資料', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipad7', name: 'iPad 7 (10.2吋)', code: 'A2197/A2200',
+      services: [
+        { name: '觸控玻璃', price: 2300, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 3300, cat: 'screen' },
+        { name: '內外都修', price: 4500, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 2000, cat: 'camera' },
+        { name: '尾排', price: 2500, cat: 'parts' },
+        { name: '開機排 / 音量排 / 喇叭', price: 2000, cat: 'parts' },
+        { name: '背殼', price: 3300, cat: 'parts' },
+        { name: '主機板維修', price: 3000, cat: 'board' },
+        { name: '救資料', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipad8', name: 'iPad 8 (10.2吋)', code: 'A2270/A2428',
+      services: [
+        { name: '觸控玻璃', price: 2300, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 3300, cat: 'screen' },
+        { name: '內外都修', price: 5000, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 2000, cat: 'camera' },
+        { name: '尾排', price: 2800, cat: 'parts' },
+        { name: '背殼', price: 3300, cat: 'parts' },
+        { name: '主機板維修', price: 3000, cat: 'board' },
+        { name: '救資料', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipad9', name: 'iPad 9 (10.2吋)', code: 'A2602/A2604',
+      services: [
+        { name: '觸控玻璃', price: 2300, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 3300, cat: 'screen' },
+        { name: '內外都修', price: 5000, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 2000, cat: 'camera' },
+        { name: '尾排', price: 3000, cat: 'parts' },
+        { name: '背殼', price: 3800, cat: 'parts' },
+        { name: '主機板維修', price: 3500, cat: 'board' },
+        { name: '救資料', price: 2500, cat: 'board' },
+        { name: '原廠維修置換 (WIFI/LTE)', price: 10190, cat: 'board', badge: '原廠整新置換' }
+      ]
+    },
+    {
+      id: 'ipad10', name: 'iPad 10 (10.9吋)', code: 'A2696/A2757',
+      services: [
+        { name: '觸控玻璃', price: 3300, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 5000, cat: 'screen' },
+        { name: '內外都修', price: 7500, cat: 'screen', hot: true },
+        { name: '電池', price: 2500, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 2500, cat: 'camera' },
+        { name: '尾排', price: 3500, cat: 'parts' },
+        { name: '背殼', price: 6000, cat: 'parts' },
+        { name: '主機板維修', price: 4000, cat: 'board' },
+        { name: '救資料', price: 3500, cat: 'board' },
+        { name: '原廠維修置換-WIFI', price: 12200, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'ipad11', name: 'iPad 11 (10.9吋)', code: 'A3354/A3355',
+      services: [
+        { name: '觸控玻璃', price: 4300, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 5000, cat: 'screen' },
+        { name: '內外都修', price: 9500, cat: 'screen', hot: true },
+        { name: '原廠觸控總成', price: 7990, cat: 'screen', badge: '原廠零件' },
+        { name: '原廠顯示總成', price: 9990, cat: 'screen', badge: '原廠零件' },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 3500, cat: 'parts' },
+        { name: '背殼', price: 6000, cat: 'parts' },
+        { name: '主機板維修', price: 5500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair1', name: 'iPad Air (1代)', code: 'A1474/A1475',
+      services: [
+        { name: '觸控玻璃', price: 1800, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 2500, cat: 'screen' },
+        { name: '內外都修', price: 3800, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 1500, cat: 'camera' },
+        { name: '尾排', price: 2000, cat: 'parts' },
+        { name: '背殼', price: 2500, cat: 'parts' },
+        { name: '主機板維修 / 救資料', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair2', name: 'iPad Air 2', code: 'A1566/A1567',
+      services: [
+        { name: '螢幕總成 (全貼合)', price: 4500, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 1500, cat: 'camera' },
+        { name: '尾排', price: 2300, cat: 'parts' },
+        { name: '背殼', price: 2500, cat: 'parts' },
+        { name: '主機板維修', price: 2500, cat: 'board' },
+        { name: '救資料', price: 2000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair3', name: 'iPad Air 3 (10.5吋)', code: 'A2152/A2123',
+      services: [
+        { name: '螢幕總成', price: 5300, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 2000, cat: 'camera' },
+        { name: '尾排', price: 2300, cat: 'parts' },
+        { name: '背殼', price: 3500, cat: 'parts' },
+        { name: '主機板維修', price: 3000, cat: 'board' },
+        { name: '救資料', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair4', name: 'iPad Air 4 (10.9吋)', code: 'A2316/A2324',
+      services: [
+        { name: '螢幕總成', price: 6800, cat: 'screen', hot: true },
+        { name: '電池', price: 2500, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 2500, cat: 'camera' },
+        { name: '尾排', price: 3300, cat: 'parts' },
+        { name: '背殼', price: 6000, cat: 'parts' },
+        { name: '主機板維修', price: 4500, cat: 'board' },
+        { name: '救資料', price: 3000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair5', name: 'iPad Air 5 (10.9吋)', code: 'A2588/A2589',
+      services: [
+        { name: '螢幕總成', price: 6800, cat: 'screen', hot: true },
+        { name: '電池', price: 2500, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 3300, cat: 'parts' },
+        { name: '背殼', price: 6000, cat: 'parts' },
+        { name: '主機板維修', price: 4500, cat: 'board' },
+        { name: '救資料', price: 3500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair6_11', name: 'iPad Air 6 (11吋)', code: 'A2902/A2903',
+      services: [
+        { name: '螢幕總成', price: 8300, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13000, cat: 'screen', badge: '原廠零件' },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 4000, cat: 'parts' },
+        { name: '主機板維修 / 救資料', price: 6000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair6_13', name: 'iPad Air 6 (13吋)', code: 'A2898/A2899',
+      services: [
+        { name: '螢幕總成', price: 9300, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 18000, cat: 'screen', badge: '原廠零件' },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 4000, cat: 'parts' },
+        { name: '主機板維修 / 救資料', price: 6000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair7_11', name: 'iPad Air 7 (11吋)', code: 'A3266/A3267',
+      services: [
+        { name: '螢幕總成', price: 9300, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 13000, cat: 'screen', badge: '原廠零件' },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭', price: 3500, cat: 'camera' },
+        { name: '尾排', price: 4500, cat: 'parts' },
+        { name: '主機板維修 / 救資料', price: 7000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadair7_13', name: 'iPad Air 7 (13吋)', code: 'A3268/A3269',
+      services: [
+        { name: '螢幕總成', price: 13500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 18000, cat: 'screen', badge: '原廠零件' },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭', price: 3500, cat: 'camera' },
+        { name: '尾排', price: 4500, cat: 'parts' },
+        { name: '主機板維修 / 救資料', price: 7000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadmini123', name: 'iPad mini 1 / 2 / 3', code: 'A1432/A1489',
+      services: [
+        { name: '觸控玻璃', price: 1800, cat: 'screen', hot: true },
+        { name: '顯示異常 (內屏)', price: 2300, cat: 'screen' },
+        { name: '內外都修', price: 3500, cat: 'screen', hot: true },
+        { name: '電池', price: 1700, cat: 'battery', hot: true },
+        { name: '尾排', price: 1700, cat: 'parts' },
+        { name: '背殼', price: 2000, cat: 'parts' }
+      ]
+    },
+    {
+      id: 'ipadmini4', name: 'iPad mini 4', code: 'A1538/A1550',
+      services: [
+        { name: '螢幕總成', price: 3800, cat: 'screen', hot: true },
+        { name: '電池', price: 2000, cat: 'battery', hot: true },
+        { name: '尾排', price: 2200, cat: 'parts' },
+        { name: '背殼', price: 2000, cat: 'parts' },
+        { name: '主機板維修', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadmini5', name: 'iPad mini 5', code: 'A2133/A2124',
+      services: [
+        { name: '螢幕總成', price: 5000, cat: 'screen', hot: true },
+        { name: '電池', price: 2300, cat: 'battery', hot: true },
+        { name: '尾排', price: 2500, cat: 'parts' },
+        { name: '背殼', price: 3500, cat: 'parts' },
+        { name: '主機板維修', price: 3500, cat: 'board' },
+        { name: '救資料', price: 2500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadmini6', name: 'iPad mini 6', code: 'A2567/A2568',
+      services: [
+        { name: '螢幕總成', price: 9000, cat: 'screen', hot: true },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 3500, cat: 'parts' },
+        { name: '背殼', price: 4300, cat: 'parts' },
+        { name: '主機板維修', price: 4500, cat: 'board' },
+        { name: '救資料', price: 3500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadmini7', name: 'iPad mini 7', code: 'A2993/A2995',
+      services: [
+        { name: '螢幕總成', price: 9500, cat: 'screen', hot: true },
+        { name: '原廠螢幕', price: 11500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池', price: 2900, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 3500, cat: 'parts' },
+        { name: '背殼', price: 5000, cat: 'parts' },
+        { name: '主機板維修 / 救資料', price: 5000, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadpro11_all', name: 'iPad Pro 11 (1~4代/M4)', code: 'A1980/A2228/A2377/A2759/A2836',
+      services: [
+        { name: '螢幕總成 (1代)', price: 7300, cat: 'screen', hot: true },
+        { name: '螢幕總成 (2代)', price: 8000, cat: 'screen', hot: true },
+        { name: '螢幕總成 (3代)', price: 8800, cat: 'screen', hot: true },
+        { name: '螢幕總成 (4代)', price: 9000, cat: 'screen', hot: true },
+        { name: '原廠螢幕 (M4)', price: 21500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池 (1~4代)', price: 2500, cat: 'battery', hot: true },
+        { name: '電池 (M4)', price: 3000, cat: 'battery', hot: true },
+        { name: '後鏡頭 / 前鏡頭', price: 3000, cat: 'camera' },
+        { name: '尾排', price: 3300, cat: 'parts' },
+        { name: '背殼', price: 5800, cat: 'parts' },
+        { name: '主機板維修', price: 4500, cat: 'board' }
+      ]
+    },
+    {
+      id: 'ipadpro129_all', name: 'iPad Pro 12.9 / 13 (M4)', code: 'A1876/A2229/A2378/A2925',
+      services: [
+        { name: '螢幕總成 (1代)', price: 7500, cat: 'screen', hot: true },
+        { name: '螢幕總成 (2代)', price: 11500, cat: 'screen', hot: true },
+        { name: '螢幕總成 (3代/4代)', price: 8500, cat: 'screen', hot: true },
+        { name: '螢幕總成 (5代/6代)', price: 10500, cat: 'screen', hot: true },
+        { name: '原廠螢幕 (13吋 M4)', price: 25500, cat: 'screen', badge: '原廠零件' },
+        { name: '電池 (1~6代)', price: 2500, cat: 'battery', hot: true },
+        { name: '電池 (13吋 M4)', price: 3000, cat: 'battery', hot: true },
+        { name: '尾排', price: 3300, cat: 'parts' },
+        { name: '背殼', price: 5800, cat: 'parts' },
+        { name: '主機板維修', price: 5500, cat: 'board' }
+      ]
+    }
+  ],
+
+  airpods: [
+    {
+      id: 'ap2', name: 'AirPods 二代', code: 'A2031/A2032',
+      services: [
+        { name: '單耳換電池', price: 800, cat: 'battery', hot: true },
+        { name: '雙耳換電池', price: 1500, cat: 'battery', hot: true },
+        { name: '耳機其他異常 (連線/破音等不管)', price: 2000, cat: 'parts', note: '單耳價格' },
+        { name: '耳機充電盒蓋子脫落 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '耳機本體底部開掉 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '原廠維修置換單耳', price: 2590, cat: 'board', badge: '原廠零件' },
+        { name: '原廠維修置換充電盒', price: 2590, cat: 'board', badge: '原廠零件' },
+        { name: '有線充電盒換電池/異常', price: 0, cat: 'board', note: '建議換新無修理', badge: '建議換新' }
+      ]
+    },
+    {
+      id: 'appro1', name: 'AirPods Pro (1代)', code: 'A2083/A2084',
+      services: [
+        { name: '單耳換電池', price: 1500, cat: 'battery', hot: true },
+        { name: '雙耳換電池', price: 2800, cat: 'battery', hot: true },
+        { name: '耳機其他異常 (連線/破音等不管)', price: 2800, cat: 'parts', note: '單耳價格' },
+        { name: '耳機充電盒蓋子脫落 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '耳機本體底部開掉 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '原廠維修置換單耳', price: 3090, cat: 'board', badge: '原廠零件' },
+        { name: '原廠維修置換充電盒', price: 3390, cat: 'board', badge: '原廠零件' }
+      ]
+    },
+    {
+      id: 'appro2', name: 'AirPods Pro 二代', code: 'A2698/A2699',
+      services: [
+        { name: '單耳換電池', price: 1800, cat: 'battery', hot: true },
+        { name: '雙耳換電池', price: 3300, cat: 'battery', hot: true },
+        { name: '耳機充電盒蓋子脫落 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '耳機本體底部開掉 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '原廠維修置換單耳', price: 3090, cat: 'board', badge: '原廠零件' },
+        { name: '原廠維修置換充電盒', price: 3390, cat: 'board', badge: '原廠零件' }
+      ]
+    },
+    {
+      id: 'ap3', name: 'AirPods 三代', code: 'A2564/A2565',
+      services: [
+        { name: '單耳換電池', price: 1300, cat: 'battery', hot: true },
+        { name: '雙耳換電池', price: 2400, cat: 'battery', hot: true },
+        { name: '耳機充電盒蓋子脫落 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '耳機本體底部開掉 (純黏合 無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '原廠維修置換單耳', price: 2590, cat: 'board', badge: '原廠零件' },
+        { name: '原廠維修置換充電盒', price: 2590, cat: 'board', badge: '原廠零件' }
+      ]
+    }
+  ],
+
+  watch: [
+    {
+      id: 'aw_s1', name: 'Watch S1', code: 'Series 1',
+      services: [
+        { name: '電池', price: 650, cat: 'battery', hot: true },
+        { name: '螢幕總成', price: 1800, cat: 'screen', hot: true },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶螢幕開掉純黏合 (無保固/排線風險)', price: 500, cat: 'parts', badge: '無保固' },
+        { name: '手錶錶帶卡死拆除 (純拆除無保固)', price: 300, cat: 'parts', badge: '無保固' },
+        { name: '手錶背蓋圓圈脫落 (純黏合無保固)', price: 500, cat: 'parts', badge: '無保固' },
+        { name: '手錶卡驚嘆號刷機 (留機維修部/有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_s2', name: 'Watch S2', code: 'Series 2',
+      services: [
+        { name: '電池', price: 650, cat: 'battery', hot: true },
+        { name: '螢幕總成', price: 2500, cat: 'screen', hot: true },
+        { name: '錶冠模組 (客訂)', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音 (客訂)', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 1800, cat: 'parts' },
+        { name: '底盤總成', price: 2000, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶螢幕開掉純黏合 (無保固)', price: 500, cat: 'parts', badge: '無保固' },
+        { name: '手錶卡驚嘆號刷機 (有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_s3', name: 'Watch S3', code: 'Series 3',
+      services: [
+        { name: '電池', price: 650, cat: 'battery', hot: true },
+        { name: '螢幕總成', price: 3000, cat: 'screen', hot: true },
+        { name: '錶冠模組 (客訂)', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音 (客訂)', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 1800, cat: 'parts' },
+        { name: '底盤總成', price: 2000, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶螢幕開掉純黏合 (無保固)', price: 500, cat: 'parts', badge: '無保固' },
+        { name: '手錶卡驚嘆號刷機 (有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_s4', name: 'Watch S4', code: '40mm / 44mm',
+      services: [
+        { name: '電池', price: 890, cat: 'battery', hot: true },
+        { name: '40mm 螢幕總成', price: 3000, cat: 'screen', hot: true },
+        { name: '44mm 螢幕總成', price: 3600, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 2000, cat: 'parts' },
+        { name: '底盤總成', price: 2300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶螢幕開掉純黏合 (無保固)', price: 500, cat: 'parts', badge: '無保固' },
+        { name: '手錶卡驚嘆號刷機 (有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_s5', name: 'Watch S5', code: '40mm / 44mm',
+      services: [
+        { name: '電池', price: 890, cat: 'battery', hot: true },
+        { name: '40mm 螢幕總成', price: 3000, cat: 'screen', hot: true },
+        { name: '44mm 螢幕總成', price: 4000, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 2000, cat: 'parts' },
+        { name: '底盤總成', price: 2300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶卡驚嘆號刷機 (有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_s6', name: 'Watch S6', code: '40mm / 44mm',
+      services: [
+        { name: '電池', price: 890, cat: 'battery', hot: true },
+        { name: '40mm 螢幕總成', price: 3000, cat: 'screen', hot: true },
+        { name: '44mm 螢幕總成', price: 4000, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 2000, cat: 'parts' },
+        { name: '底盤總成', price: 2300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶卡驚嘆號刷機 (有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_se', name: 'Watch SE (1代)', code: '40mm / 44mm',
+      services: [
+        { name: '電池', price: 890, cat: 'battery', hot: true },
+        { name: '40mm 螢幕總成', price: 3000, cat: 'screen', hot: true },
+        { name: '44mm 螢幕總成', price: 4000, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 2000, cat: 'parts' },
+        { name: '底盤總成', price: 2300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '手錶卡驚嘆號刷機 (有死機風險)', price: 500, cat: 'board', badge: '留機處理' }
+      ]
+    },
+    {
+      id: 'aw_se2', name: 'Watch SE2', code: '40mm / 44mm',
+      services: [
+        { name: '電池', price: 1290, cat: 'battery', hot: true },
+        { name: '40mm 螢幕總成', price: 3500, cat: 'screen', hot: true },
+        { name: '44mm 螢幕總成', price: 4300, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2000, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2300, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 1500, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 2000, cat: 'parts' },
+        { name: '底盤總成', price: 2500, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 6390, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 7190, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_se3', name: 'Watch SE3', code: '40mm / 44mm',
+      services: [
+        { name: '40mm 螢幕總成', price: 4500, cat: 'screen', hot: true },
+        { name: '44mm 螢幕總成', price: 5000, cat: 'screen', hot: true },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 6390, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 7190, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_s7', name: 'Watch S7', code: '41mm / 45mm',
+      services: [
+        { name: '電池', price: 1190, cat: 'battery', hot: true },
+        { name: '41mm 螢幕總成', price: 3500, cat: 'screen', hot: true },
+        { name: '45mm 螢幕總成', price: 4000, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2300, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2300, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 3000, cat: 'parts' },
+        { name: '底盤總成', price: 3500, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 9890, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 11590, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_s8', name: 'Watch S8', code: '41mm / 45mm',
+      services: [
+        { name: '電池', price: 1290, cat: 'battery', hot: true },
+        { name: '41mm 螢幕總成', price: 4500, cat: 'screen', hot: true },
+        { name: '45mm 螢幕總成', price: 5800, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2300, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2300, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 3000, cat: 'parts' },
+        { name: '底盤總成', price: 3500, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 9890, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 11590, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_s9', name: 'Watch S9', code: '41mm / 45mm',
+      services: [
+        { name: '電池', price: 1490, cat: 'battery', hot: true },
+        { name: '41mm 螢幕總成', price: 5000, cat: 'screen', hot: true },
+        { name: '45mm 螢幕總成', price: 5800, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2300, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2300, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 2000, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 3000, cat: 'parts' },
+        { name: '底盤總成', price: 4000, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 9890, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 11590, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_s10', name: 'Watch S10', code: '42mm / 46mm',
+      services: [
+        { name: '電池', price: 1490, cat: 'battery', hot: true },
+        { name: '42mm 螢幕總成', price: 7500, cat: 'screen', hot: true },
+        { name: '46mm 螢幕總成', price: 7500, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2300, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2300, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 3000, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 3500, cat: 'parts' },
+        { name: '中框總成', price: 4300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 9890, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 11590, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_s11', name: 'Watch S11', code: '42mm / 46mm',
+      services: [
+        { name: '電池', price: 1790, cat: 'battery', hot: true },
+        { name: '42mm 螢幕總成', price: 7500, cat: 'screen', hot: true },
+        { name: '46mm 螢幕總成', price: 7500, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2300, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2300, cat: 'parts' },
+        { name: '圓圈充電總成 (僅玻璃破裂)', price: 3000, cat: 'parts' },
+        { name: '圓圈充電總成 (功能異常)', price: 3500, cat: 'parts' },
+        { name: '中框總成', price: 4300, cat: 'parts' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '原廠維修置換-GPS', price: 9890, cat: 'board', badge: '原廠置換' },
+        { name: '原廠維修置換-LTE', price: 11590, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_ultra1', name: 'Watch Ultra (1代)', code: '49mm',
+      services: [
+        { name: '電池', price: 1990, cat: 'battery', hot: true },
+        { name: '49mm 螢幕總成', price: 6800, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2800, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2800, cat: 'parts' },
+        { name: '底盤總成', price: 5000, cat: 'parts' },
+        { name: '泡水清潔', price: 1000, cat: 'board' },
+        { name: '原廠維修置換-LTE', price: 16790, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_ultra2', name: 'Watch Ultra 2', code: '49mm',
+      services: [
+        { name: '電池', price: 1990, cat: 'battery', hot: true },
+        { name: '49mm 螢幕總成', price: 7800, cat: 'screen', hot: true },
+        { name: '錶冠模組', price: 2800, cat: 'parts' },
+        { name: '開機鍵+收音', price: 2800, cat: 'parts' },
+        { name: '底盤總成', price: 5000, cat: 'parts' },
+        { name: '泡水清潔', price: 1000, cat: 'board' },
+        { name: '原廠維修置換-LTE', price: 16790, cat: 'board', badge: '原廠置換' }
+      ]
+    },
+    {
+      id: 'aw_ultra3', name: 'Watch Ultra 3', code: '49mm',
+      services: [
+        { name: '電池', price: 2190, cat: 'battery', hot: true },
+        { name: '49mm 螢幕總成', price: 9000, cat: 'screen', hot: true },
+        { name: '原廠維修置換-LTE', price: 16790, cat: 'board', badge: '原廠置換' }
+      ]
+    }
+  ],
+
+  switch: [
+    {
+      id: 'sw_std', name: 'Switch 一般版 / 電力加強版', code: 'HAC-001 / HAC-001(-01)',
+      services: [
+        { name: '更換觸屏', price: 2500, cat: 'screen', hot: true },
+        { name: '更換液晶', price: 2500, cat: 'screen', hot: true },
+        { name: '更換液晶 (福利品保固一個月)', price: 1500, cat: 'screen', badge: '福利品1個月保固' },
+        { name: '電池', price: 900, cat: 'battery', hot: true },
+        { name: '手把連接滑軌 (單邊)', price: 600, cat: 'parts', hot: true },
+        { name: '手把連接滑軌 (雙邊)', price: 1100, cat: 'parts', hot: true },
+        { name: '遊戲讀卡異常 (卡曹)', price: 1400, cat: 'parts' },
+        { name: '記憶卡讀卡異常 (卡曹)', price: 900, cat: 'parts' },
+        { name: '更換耳機孔', price: 1400, cat: 'parts' },
+        { name: '喇叭 (單邊)', price: 600, cat: 'parts' },
+        { name: '喇叭 (雙邊)', price: 1100, cat: 'parts' },
+        { name: '電源音量鍵', price: 600, cat: 'parts' },
+        { name: '換風扇', price: 700, cat: 'parts' },
+        { name: '換散熱膏清潔', price: 600, cat: 'board' },
+        { name: '泡水清潔', price: 600, cat: 'board' },
+        { name: '背面支架', price: 300, cat: 'parts' },
+        { name: '主板原板維修', price: 2400, cat: 'board' },
+        { name: '代工外配 (觸屏液晶不代工)', price: 500, cat: 'board', badge: '代工無保固' }
+      ]
+    },
+    {
+      id: 'sw_lite', name: 'Switch Lite 主機', code: 'HDH-001',
+      services: [
+        { name: '更換觸屏', price: 2800, cat: 'screen', hot: true },
+        { name: '更換液晶', price: 2800, cat: 'screen', hot: true },
+        { name: '電池', price: 1000, cat: 'battery', hot: true },
+        { name: '蘑菇頭 (單邊左/右)', price: 590, cat: 'parts', hot: true, note: '左$590 / 右$690' },
+        { name: '蘑菇頭 (雙邊)', price: 1100, cat: 'parts', hot: true },
+        { name: '按鍵 (不包含R鍵)', price: 690, cat: 'parts' },
+        { name: 'R鍵 (焊在主板)', price: 1500, cat: 'parts' },
+        { name: '記憶卡讀卡異常 (卡曹焊接)', price: 2300, cat: 'parts' },
+        { name: '遊戲讀卡異常 (卡曹)', price: 1500, cat: 'parts' },
+        { name: '更換耳機孔', price: 1000, cat: 'parts' },
+        { name: '電源音量鍵', price: 1000, cat: 'parts' },
+        { name: '喇叭 (單邊)', price: 800, cat: 'parts' },
+        { name: '喇叭 (雙邊)', price: 1400, cat: 'parts' },
+        { name: '換風扇', price: 900, cat: 'parts' },
+        { name: '換散熱膏清潔', price: 600, cat: 'board' },
+        { name: '泡水清潔', price: 800, cat: 'board' },
+        { name: '主板原板維修', price: 2400, cat: 'board' },
+        { name: '代工外配 (觸屏液晶不代工)', price: 500, cat: 'board', badge: '代工無保固' }
+      ]
+    },
+    {
+      id: 'sw_oled', name: 'Switch OLED 主機', code: 'HEG-001',
+      services: [
+        { name: '更換螢幕總成', price: 4200, cat: 'screen', hot: true },
+        { name: '電池', price: 900, cat: 'battery', hot: true },
+        { name: '手把連接滑軌 (單邊)', price: 600, cat: 'parts', hot: true },
+        { name: '手把連接滑軌 (雙邊)', price: 1100, cat: 'parts', hot: true },
+        { name: '記憶卡讀卡異常 (卡曹)', price: 2000, cat: 'parts' },
+        { name: '遊戲讀卡異常 (卡曹)', price: 2000, cat: 'parts' },
+        { name: '更換耳機孔', price: 2200, cat: 'parts' },
+        { name: '電源音量鍵', price: 600, cat: 'parts' },
+        { name: '喇叭 (單邊)', price: 600, cat: 'parts' },
+        { name: '喇叭 (雙邊)', price: 1100, cat: 'parts' },
+        { name: '換風扇', price: 700, cat: 'parts' },
+        { name: '換散熱膏清潔', price: 700, cat: 'board' },
+        { name: '泡水清潔', price: 600, cat: 'board' },
+        { name: '主板原板維修', price: 2800, cat: 'board' },
+        { name: '代工外配 (代換總成$1500)', price: 500, cat: 'board', badge: '代工無保固' }
+      ]
+    },
+    {
+      id: 'sw_joycon', name: 'Joy-Con 搖桿 (獨立裝置計件)', code: 'Joy-Con L/R',
+      services: [
+        { name: '蘑菇頭', price: 390, cat: 'parts', hot: true },
+        { name: '電池', price: 490, cat: 'battery', hot: true },
+        { name: '單按鍵 (右邊所有單獨按鍵)', price: 390, cat: 'parts' },
+        { name: '有線連接 (側邊滑軌充電)', price: 390, cat: 'parts' },
+        { name: '無線連接 藍芽 (SL SR排線)', price: 390, cat: 'parts' },
+        { name: 'ABXY 同一條排線', price: 390, cat: 'parts' },
+        { name: '上下左右 同一條排線', price: 390, cat: 'parts' },
+        { name: 'L 減 同一條排線', price: 390, cat: 'parts' },
+        { name: 'R (焊點 需維修部處理)', price: 390, cat: 'parts' },
+        { name: 'ZL / ZR (單顆)', price: 390, cat: 'parts' },
+        { name: 'SL SR 同一條排線', price: 390, cat: 'parts' },
+        { name: '+鍵 / 截圖鍵 / HOME鍵 (焊在主板)', price: 390, cat: 'parts' },
+        { name: '主機板維修', price: 800, cat: 'board' },
+        { name: '泡水清潔', price: 390, cat: 'board' },
+        { name: '代工 (無保固/滑軌不代工)', price: 300, cat: 'board', badge: '無保固' }
+      ]
+    },
+    {
+      id: 'sw_pro_dock', name: 'Switch PRO手把 / 原廠底座', code: 'Pro Controller / Dock',
+      services: [
+        { name: 'PRO手把 電池', price: 600, cat: 'battery', hot: true },
+        { name: '原廠電視轉接盒 (功能異常)', price: 1000, cat: 'board', hot: true }
+      ]
+    },
+    {
+      id: 'sw2', name: 'Switch 2 主機 / Joy-Con 2', code: 'Switch 2',
+      services: [
+        { name: 'Switch 2 主機 螢幕總成', price: 6500, cat: 'screen', hot: true },
+        { name: 'Joy-Con 2 蘑菇頭', price: 690, cat: 'parts', hot: true },
+        { name: 'Joy-Con 2 ZL/ZR', price: 690, cat: 'parts' },
+        { name: 'Joy-Con 2 手把連接器', price: 690, cat: 'parts' }
+      ]
+    }
+  ],
+
+  windows: [
+    {
+      id: 'win_laptop', name: 'Windows 筆電維修 (HP/Dell/Lenovo/MSI/Asus/Acer/GIGABYTE)', code: '拆機比對料號報價',
+      services: [
+        { name: '深層清潔 (除灰塵/風扇油污/重上散熱膏)', price: 1000, cat: 'board', hot: true, badge: '搭維修折$300' },
+        { name: '重灌系統 (僅接筆電/綁定正版序號)', price: 800, cat: 'board', hot: true, note: '不包含在清潔折$300活動' },
+        { name: '檢測費 (充電孔/USB孔檢測後報價)', price: 500, cat: 'board', hot: true },
+        { name: '電池 (預估 $2000-3500)', price: 2000, cat: 'battery', hot: true, note: '預估起價，依料號報價' },
+        { name: '螢幕 (預估 $3000 以上)', price: 3000, cat: 'screen', hot: true, note: '需查面板型號精準報價' },
+        { name: '鍵盤 (預估 $2500-5000)', price: 2500, cat: 'parts', note: '僅備料繁體中文/鉚釘封裝說明' },
+        { name: '喇叭 (預估 $1000-2000)', price: 1000, cat: 'parts' },
+        { name: 'WIFI 模組 (預估 $2000-5000)', price: 2000, cat: 'parts' },
+        { name: '風扇 (預估 $1000-3000)', price: 1000, cat: 'parts' },
+        { name: '觸控板 (預估 $2000-5000)', price: 2000, cat: 'parts' },
+        { name: '硬碟升級代工 (單純擴充 +$800)', price: 800, cat: 'parts', note: '另計硬碟原價' },
+        { name: '硬碟升級代工 (含系統移植 +$1500)', price: 1500, cat: 'parts', note: '另計硬碟原價' },
+        { name: '記憶體升級代工 (+$500)', price: 500, cat: 'parts', note: '另計記憶體原價' },
+        { name: '泡水清潔', price: 1500, cat: 'board' },
+        { name: '零件代裝 (預估 $300-2500 看組裝品項)', price: 300, cat: 'board' }
+      ]
+    },
+    {
+      id: 'win_desktop', name: 'Windows 桌上型電腦維修', code: '桌機全系列',
+      services: [
+        { name: '深層清潔', price: 1500, cat: 'board', hot: true, badge: '搭維修折$300' },
+        { name: '顯卡清潔 (需先確認原廠保固)', price: 800, cat: 'board', hot: true },
+        { name: 'WIFI 模組', price: 2000, cat: 'parts' },
+        { name: '泡水清潔', price: 2000, cat: 'board' },
+        { name: '檢測費', price: 800, cat: 'board', hot: true },
+        { name: '零件代裝 (預估 $300-2500 看組裝品項)', price: 300, cat: 'parts' },
+        { name: '硬體更換 (POWER/主板/風扇/CPU/RAM/SSD/顯卡)', price: 500, cat: 'parts', note: '看原價屋多少 + 代工費' }
+      ]
+    }
+  ]
+};
+
+const PROMO_TEXTS = {
+  iphone: '同一支 iPhone 維修：兩項 95 折、三項 9 折、四項以上 85 折（原廠零件與主板皆適用）',
+  ipad: '同一台 iPad 維修：兩項 95 折、三項 9 折、四項以上 85 折（原廠零件與主板皆適用）',
+  airpods: 'AirPods 系列依門市現場標準報價（外殼純黏合報價 $300 無保固）',
+  watch: '同一支 Apple Watch 維修兩項享 95 折（全品項皆適用）',
+  switch: 'Switch 單一裝置（同一主機 或 同一支搖桿）兩項以上維修享 95 折！',
+  windows: 'Windows 電腦：兩項維修享 95 折；任意維修加「深層清潔」可折 $300（重灌系統除外）！'
+};
+
+let db = JSON.parse(localStorage.getItem('qbro_repair_db_v5')) || JSON.parse(JSON.stringify(DEFAULT_DB));
+let currentCategory = 'iphone';
+let currentModelId = 'ip6';
+let currentServiceFilter = 'all';
+let searchQuery = '';
+let cart = [];
+let isAdmin = false;
+let isLargeMode = false;
+
+function init() {
+  if (localStorage.getItem('qbro_dark') === '1') {
+    document.documentElement.classList.add('dark');
+    document.getElementById('theme-icon').textContent = '☀️';
+  }
+  bindStaticEvents();
+  renderModels();
+  renderServices();
+  renderCart();
+}
+
+function bindStaticEvents() {
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => switchCategory(btn.dataset.cat));
+  });
+
+  document.getElementById('search-input').addEventListener('input', (e) => handleSearch(e.target.value));
+  document.getElementById('clear-search').addEventListener('click', clearSearch);
+
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => setServiceFilter(btn.dataset.filter));
+  });
+
+  document.getElementById('btn-open-specs').addEventListener('click', () => openModal('specs-modal'));
+  document.getElementById('btn-banner-specs').addEventListener('click', () => openModal('specs-modal'));
+  document.getElementById('btn-large-text').addEventListener('click', toggleLargeMode);
+  document.getElementById('btn-dark-mode').addEventListener('click', toggleDarkMode);
+  document.getElementById('btn-admin').addEventListener('click', toggleAdminMode);
+
+  document.getElementById('btn-export-json').addEventListener('click', exportDataJSON);
+  document.getElementById('btn-reset-data').addEventListener('click', resetDefaultData);
+
+  document.getElementById('btn-clear-cart').addEventListener('click', clearCart);
+  document.getElementById('manual-discount-toggle').addEventListener('change', toggleManualDiscount);
+  document.getElementById('manual-discount-input').addEventListener('input', renderCart);
+
+  document.getElementById('btn-open-confirm').addEventListener('click', openCustomerCard);
+  document.getElementById('btn-copy-quote').addEventListener('click', copyQuoteText);
+  document.getElementById('btn-confirm-and-copy').addEventListener('click', () => {
+    copyQuoteText();
+    closeModal('confirm-modal');
+  });
+
+  document.querySelectorAll('.modal-close-btn').forEach(btn => {
+    btn.addEventListener('click', () => closeModal(btn.dataset.closeModal));
+  });
+
+  // Event delegation for model pills
+  document.getElementById('model-pills').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-model-id]');
+    if (btn) {
+      selectModel(btn.dataset.modelId, btn.dataset.cat);
+    }
+  });
+
+  // Event delegation for service grid (+ Add button & Admin price input)
+  document.getElementById('services-grid').addEventListener('click', (e) => {
+    const addBtn = e.target.closest('[data-add-service]');
+    if (addBtn) {
+      const modelId = addBtn.dataset.modelId;
+      const idx = Number(addBtn.dataset.serviceIdx);
+      addServiceByIndex(modelId, idx);
+    }
+  });
+
+  document.getElementById('services-grid').addEventListener('change', (e) => {
+    const priceInput = e.target.closest('[data-admin-price]');
+    if (priceInput) {
+      updateServicePriceByIndex(priceInput.dataset.modelId, Number(priceInput.dataset.serviceIdx), priceInput.value);
+    }
+  });
+
+  // Event delegation for cart item removal
+  document.getElementById('cart-items-list').addEventListener('click', (e) => {
+    const rmBtn = e.target.closest('[data-remove-uid]');
+    if (rmBtn) {
+      removeFromCart(rmBtn.dataset.removeUid);
+    }
+  });
+}
+
+function switchCategory(cat) {
+  currentCategory = cat;
+  searchQuery = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('clear-search').classList.add('hidden');
+
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    const active = btn.dataset.cat === cat;
+    btn.className = active
+      ? 'cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-white shadow-sm shrink-0'
+      : 'cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0';
+  });
+
+  document.getElementById('category-promo-text').textContent = PROMO_TEXTS[cat] || '';
+
+  const list = getFilteredModels();
+  if (list.length > 0) {
+    currentModelId = list[0].id;
+  }
+  renderModels();
+  renderServices();
+}
+
+function getAllModelsWithCat() {
+  const result = [];
+  Object.keys(db).forEach(cat => {
+    db[cat].forEach(m => {
+      result.push({ ...m, _cat: cat });
+    });
+  });
+  return result;
+}
+
+function getFilteredModels() {
+  const q = searchQuery.trim().toLowerCase();
+  if (!q) return db[currentCategory].map(m => ({ ...m, _cat: currentCategory }));
+  return getAllModelsWithCat().filter(m =>
+    m.name.toLowerCase().includes(q) || (m.code && m.code.toLowerCase().includes(q))
+  );
+}
+
+function handleSearch(val) {
+  searchQuery = val;
+  document.getElementById('clear-search').classList.toggle('hidden', !val);
+  const filtered = getFilteredModels();
+  if (filtered.length > 0 && !filtered.some(m => m.id === currentModelId)) {
+    currentModelId = filtered[0].id;
+    if (filtered[0]._cat && filtered[0]._cat !== currentCategory) {
+      currentCategory = filtered[0]._cat;
+      updateCategoryTabUI(currentCategory);
+    }
+  }
+  renderModels();
+  renderServices();
+}
+
+function updateCategoryTabUI(cat) {
+  document.querySelectorAll('.cat-tab').forEach(btn => {
+    const active = btn.dataset.cat === cat;
+    btn.className = active
+      ? 'cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all bg-white dark:bg-slate-700 text-brand-600 dark:text-white shadow-sm shrink-0'
+      : 'cat-tab tap-active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all text-slate-600 dark:text-slate-300 shrink-0';
+  });
+  document.getElementById('category-promo-text').textContent = PROMO_TEXTS[cat] || '';
+}
+
+function clearSearch() {
+  searchQuery = '';
+  document.getElementById('search-input').value = '';
+  document.getElementById('clear-search').classList.add('hidden');
+  renderModels();
+  renderServices();
+}
+
+function selectModel(modelId, cat) {
+  if (cat && cat !== currentCategory) {
+    currentCategory = cat;
+    updateCategoryTabUI(cat);
+  }
+  currentModelId = modelId;
+  renderModels();
+  renderServices();
+}
+
+function getCurrentModel() {
+  const all = getAllModelsWithCat();
+  return all.find(m => m.id === currentModelId) || { ...db[currentCategory][0], _cat: currentCategory };
+}
+
+function renderModels() {
+  const container = document.getElementById('model-pills');
+  const models = getFilteredModels();
+  if (models.length === 0) {
+    container.innerHTML = `<span class="text-xs text-slate-400 py-1">找不到符合「${searchQuery}」的型號</span>`;
+    return;
+  }
+  container.innerHTML = models.map(m => {
+    const active = m.id === currentModelId;
+    const catTag = m._cat || currentCategory;
+    return `
+      <button data-model-id="${m.id}" data-cat="${catTag}"
+        class="tap-active shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+          active
+            ? 'bg-brand-600 text-white shadow-md shadow-brand-500/25'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+        }">
+        <span>${m.name}</span>
+        ${m.code && (catTag === 'ipad' || catTag === 'watch') ? `<span class="text-[10px] opacity-75">(${m.code.split('/')[0]})</span>` : ''}
+      </button>
+    `;
+  }).join('');
+}
+
+function setServiceFilter(filter) {
+  currentServiceFilter = filter;
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    const active = btn.dataset.filter === filter;
+    btn.className = active
+      ? 'filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-brand-600 text-white shadow-sm shrink-0'
+      : 'filter-pill tap-active px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0';
+  });
+  renderServices();
+}
+
+function renderServices() {
+  const model = getCurrentModel();
+  document.getElementById('cart-current-model').textContent = `${model.name} ${model.code ? `(${model.code})` : ''}`;
+
+  const grid = document.getElementById('services-grid');
+  const allServices = model.services || [];
+  let list = allServices.map((s, originalIndex) => ({ ...s, _idx: originalIndex }));
+
+  if (currentServiceFilter === 'hot') {
+    list = list.filter(s => s.hot);
+  } else if (currentServiceFilter !== 'all') {
+    list = list.filter(s => s.cat === currentServiceFilter);
+  }
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="col-span-full text-center py-12 text-slate-400 text-sm">此分類暫無獨立報價項目，請切換至「全部服務項目」檢視。</div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(s => {
+    const isAdded = cart.some(c => c.modelId === model.id && c.name === s.name);
+    const badgeHtml = s.badge
+      ? `<span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-bold ${
+          s.badge.includes('原廠')
+            ? 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300'
+            : s.badge.includes('無保固') || s.badge.includes('建議')
+            ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300'
+            : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+        }">${s.badge}</span>`
+      : '';
+
+    const priceDisplay = s.price === 0
+      ? `<span class="price-text text-lg font-black text-slate-500">建議換新</span>`
+      : `<span class="price-text text-xl font-black text-brand-600">NT$ ${s.price.toLocaleString()}</span>`;
+
+    return `
+      <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border ${
+        isAdded
+          ? 'border-brand-500 ring-1 ring-brand-500/30 bg-rose-50/20 dark:bg-rose-950/10'
+          : 'border-slate-200/80 dark:border-slate-800'
+      } shadow-sm flex flex-col justify-between gap-3 transition-all">
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="item-title font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100 leading-snug">${s.name}</h3>
+          </div>
+          <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
+            ${badgeHtml}
+            ${s.note ? `<span class="text-[11px] text-slate-400">${s.note}</span>` : ''}
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-end justify-between gap-2">
+          <div>
+            <span class="text-[11px] text-slate-400 block">門市現場價</span>
+            ${
+              isAdmin
+                ? `<input type="number" data-admin-price="1" data-model-id="${model.id}" data-service-idx="${s._idx}" value="${s.price}" class="w-28 px-2 py-1 rounded-lg border border-emerald-500 bg-emerald-50 dark:bg-emerald-950 text-brand-600 font-black text-lg" />`
+                : priceDisplay
+            }
+          </div>
+          ${
+            s.price > 0
+              ? `<button data-add-service="1" data-model-id="${model.id}" data-service-idx="${s._idx}"
+                  class="tap-active px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                    isAdded
+                      ? 'bg-brand-600 text-white shadow-sm'
+                      : 'bg-slate-100 hover:bg-brand-600 text-slate-700 hover:text-white dark:bg-slate-800 dark:text-slate-200'
+                  }">
+                  ${isAdded ? '✓ 已加入 (再加)' : '+ 加入'}
+                </button>`
+              : `<span class="text-xs font-bold text-slate-400 px-2 py-1.5">無單獨維修</span>`
+          }
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function addServiceByIndex(modelId, serviceIndex) {
+  const all = getAllModelsWithCat();
+  const model = all.find(m => m.id === modelId);
+  if (!model || !model.services[serviceIndex]) return;
+
+  const s = model.services[serviceIndex];
+  const uid = 'item_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+
+  cart.push({
+    uid: uid,
+    category: model._cat,
+    modelId: model.id,
+    modelName: model.name,
+    name: s.name,
+    price: Number(s.price),
+    cat: s.cat,
+    noDiscount: !!s.noDiscount
+  });
+
+  renderServices();
+  renderCart();
+}
+
+function removeFromCart(uid) {
+  cart = cart.filter(item => item.uid !== uid);
+  renderServices();
+  renderCart();
+}
+
+function clearCart() {
+  cart = [];
+  document.getElementById('manual-discount-toggle').checked = false;
+  document.getElementById('manual-discount-box').classList.add('hidden');
+  document.getElementById('manual-discount-input').value = 0;
+  renderServices();
+  renderCart();
+}
+
+function toggleManualDiscount() {
+  const checked = document.getElementById('manual-discount-toggle').checked;
+  document.getElementById('manual-discount-box').classList.toggle('hidden', !checked);
+  renderCart();
+}
+
+/**
+ * 折扣計算核心引擎：
+ * 1. iPhone / iPad：依「同一裝置 (modelId)」分組計算可折抵零件數：
+ *    - 2 項零件：該機可折抵零件 95 折 (折 5%)
+ *    - 3 項零件：該機可折抵零件 9 折 (折 10%)
+ *    - 4 項以上零件：該機可折抵零件 85 折 (折 15%)
+ * 2. Apple Watch：同一支錶兩項以上維修 95 折 (折 5%)
+ * 3. Switch：單一裝置 (主機與 Joy-Con 分開計件) 兩項以上維修 95 折 (折 5%)
+ * 4. Windows 電腦：
+ *    - 兩項以上維修 95 折 (折 5%)
+ *    - 任意維修 +「深層清潔」可折 $300（重灌系統不包含）
+ */
+function calculateTotals() {
+  const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+  let promoDiscount = 0;
+  const breakdownNotes = [];
+
+  // Group items by device (modelId)
+  const groups = {};
+  cart.forEach(item => {
+    if (!groups[item.modelId]) {
+      groups[item.modelId] = {
+        category: item.category,
+        modelName: item.modelName,
+        items: []
+      };
+    }
+    groups[item.modelId].items.push(item);
+  });
+
+  Object.values(groups).forEach(group => {
+    const cat = group.category;
+    const eligibleItems = group.items;
+
+    if (cat === 'iphone' || cat === 'ipad') {
+      const count = eligibleItems.length;
+      let rate = 0;
+      let label = '';
+      if (count === 2) {
+        rate = 0.05;
+        label = '2項零件95折';
+      } else if (count === 3) {
+        rate = 0.10;
+        label = '3項零件9折';
+      } else if (count >= 4) {
+        rate = 0.15;
+        label = '4項以上85折';
+      }
+      if (rate > 0) {
+        const groupSum = eligibleItems.reduce((s, i) => s + i.price, 0);
+        const disc = Math.round(groupSum * rate);
+        promoDiscount += disc;
+        breakdownNotes.push(`${group.modelName} (${label})：-NT$ ${disc.toLocaleString()}`);
+      }
+    } else if (cat === 'watch' || cat === 'switch') {
+      // 單一裝置 (同一支 Watch / 同一台 Switch 主機 / 同一支 Joy-Con) 兩項以上 95 折
+      if (eligibleItems.length >= 2) {
+        const groupSum = eligibleItems.reduce((s, i) => s + i.price, 0);
+        const disc = Math.round(groupSum * 0.05);
+        promoDiscount += disc;
+        breakdownNotes.push(`${group.modelName} (同裝置多項95折)：-NT$ ${disc.toLocaleString()}`);
+      }
+    } else if (cat === 'windows') {
+      // 兩項維修 95 折
+      if (eligibleItems.length >= 2) {
+        const groupSum = eligibleItems.reduce((s, i) => s + i.price, 0);
+        const disc = Math.round(groupSum * 0.05);
+        promoDiscount += disc;
+        breakdownNotes.push(`${group.modelName} (兩項維修95折)：-NT$ ${disc.toLocaleString()}`);
+      }
+      // 任意維修加「深層清潔」可折 300 (重灌系統不包含)
+      const hasDeepClean = group.items.some(i => i.name.includes('深層清潔'));
+      const hasOtherValidRepair = group.items.some(
+        i => !i.name.includes('深層清潔') && !i.name.includes('重灌系統') && !i.name.includes('檢測費')
+      );
+      if (hasDeepClean && hasOtherValidRepair) {
+        promoDiscount += 300;
+        breakdownNotes.push(`${group.modelName} (維修加深層清潔折$300)：-NT$ 300`);
+      }
+    }
+  });
+
+  let manualDiscount = 0;
+  if (document.getElementById('manual-discount-toggle').checked) {
+    manualDiscount = Math.max(0, Number(document.getElementById('manual-discount-input').value) || 0);
+  }
+
+  const totalDiscount = promoDiscount + manualDiscount;
+  const finalTotal = Math.max(0, subtotal - totalDiscount);
+
+  return { subtotal, promoDiscount, manualDiscount, totalDiscount, finalTotal, breakdownNotes };
+}
+
+function renderCart() {
+  const listEl = document.getElementById('cart-items-list');
+  const badgeEl = document.getElementById('cart-count-badge');
+  badgeEl.textContent = `${cart.length} 項`;
+
+  if (cart.length === 0) {
+    listEl.innerHTML = `
+      <div class="h-full flex flex-col items-center justify-center text-center py-8 px-4 text-slate-400">
+        <span class="text-3xl mb-2 opacity-60">🛠️</span>
+        <p class="text-xs font-bold">尚未選取任何維修項目</p>
+        <p class="text-[11px] mt-1">點擊左側項目「+ 加入」即可自動套用同機多項階梯折扣</p>
+      </div>
+    `;
+  } else {
+    listEl.innerHTML = cart.map((item, index) => `
+      <div class="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 flex items-center justify-between gap-2">
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-1.5">
+            <span class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-[10px] font-bold text-slate-700 dark:text-slate-200 shrink-0">${item.modelName}</span>
+            <span class="text-[10px] text-slate-400">#${index + 1}</span>
+          </div>
+          <div class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100 mt-1 leading-snug break-words">${item.name}</div>
+          <div class="text-brand-600 font-black text-xs mt-0.5">NT$ ${item.price.toLocaleString()}</div>
+        </div>
+        <button data-remove-uid="${item.uid}" class="tap-active w-8 h-8 rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-400 hover:text-rose-600 flex items-center justify-center shrink-0" title="移除此項">
+          🗑️
+        </button>
+      </div>
+    `).join('');
+  }
+
+  const { subtotal, promoDiscount, totalDiscount, finalTotal, breakdownNotes } = calculateTotals();
+  document.getElementById('summary-subtotal').textContent = `NT$ ${subtotal.toLocaleString()}`;
+  document.getElementById('discount-label').textContent = promoDiscount > 0 ? '活動優惠折抵 (已套用階梯折扣!)' : '多項組合自動折抵';
+  document.getElementById('summary-discount').textContent = `-NT$ ${totalDiscount.toLocaleString()}`;
+  document.getElementById('summary-total').textContent = `NT$ ${finalTotal.toLocaleString()}`;
+
+  const breakdownEl = document.getElementById('discount-breakdown');
+  breakdownEl.innerHTML = breakdownNotes.map(note => `<div>• ${note}</div>`).join('');
+}
+
+function openCustomerCard() {
+  if (cart.length === 0) {
+    showToast('請先在左側加入至少一項維修項目！');
+    return;
+  }
+  const { subtotal, promoDiscount, manualDiscount, finalTotal, breakdownNotes } = calculateTotals();
+  const body = document.getElementById('confirm-modal-body');
+
+  body.innerHTML = `
+    <div class="space-y-2.5">
+      ${cart.map((item, i) => `
+        <div class="flex items-center justify-between py-2.5 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <span class="text-xs font-bold text-brand-600 block">${item.modelName}</span>
+            <span class="font-bold text-base">${i + 1}. ${item.name}</span>
+          </div>
+          <span class="font-black text-base">NT$ ${item.price.toLocaleString()}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="bg-slate-50 dark:bg-slate-800/70 rounded-2xl p-4 space-y-1.5 text-sm">
+      <div class="flex justify-between text-slate-500">
+        <span>項目原價小計</span>
+        <span>NT$ ${subtotal.toLocaleString()}</span>
+      </div>
+      ${breakdownNotes.map(note => `
+        <div class="flex justify-between text-emerald-600 font-bold text-xs">
+          <span>⚡ ${note.split('：')[0]}</span>
+          <span>${note.split('：')[1]}</span>
+        </div>
+      `).join('')}
+      ${manualDiscount > 0 ? `
+        <div class="flex justify-between text-emerald-600 font-bold">
+          <span>現場專案折抵</span>
+          <span>-NT$ ${manualDiscount.toLocaleString()}</span>
+        </div>` : ''}
+      <div class="pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
+        <span class="font-black text-base">確認維修總金額</span>
+        <span class="text-3xl font-black text-brand-600">NT$ ${finalTotal.toLocaleString()}</span>
+      </div>
+    </div>
+    <p class="text-xs text-slate-400 text-center">※ 以上報價含專業拆裝工資與零件保固，維修前請確認重要資料已備份。</p>
+  `;
+  openModal('confirm-modal');
+}
+
+function copyQuoteText() {
+  if (cart.length === 0) {
+    showToast('估價單目前是空的喔！');
+    return;
+  }
+  const { subtotal, manualDiscount, finalTotal, breakdownNotes } = calculateTotals();
+  const lines = [
+    '【Q哥專業維修 - 現場估價明細】',
+    ...cart.map((item, i) => `${i + 1}. [${item.modelName}] ${item.name}：NT$ ${item.price.toLocaleString()}`),
+    '------------------------',
+    `項目原價小計：NT$ ${subtotal.toLocaleString()}`
+  ];
+  breakdownNotes.forEach(note => lines.push(`優惠折抵 (${note.split('：')[0]})：${note.split('：')[1]}`));
+  if (manualDiscount > 0) lines.push(`現場專案折抵：-NT$ ${manualDiscount.toLocaleString()}`);
+  lines.push(`👉 現場優惠總計：NT$ ${finalTotal.toLocaleString()}`);
+
+  const text = lines.join(String.fromCharCode(10));
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✅ 已複製完整估價明細，可直接貼給客人！');
+  }).catch(() => {
+    showToast('複製失敗，請手動截圖確認卡');
+  });
+}
+
+function toggleAdminMode() {
+  if (!isAdmin) {
+    const pwd = prompt('請輸入店長管理密碼（預設 0000）：');
+    if (pwd !== '0000') {
+      if (pwd !== null) alert('密碼錯誤！');
+      return;
+    }
+    isAdmin = true;
+    document.getElementById('admin-icon').textContent = '🔓';
+    document.getElementById('admin-banner').classList.remove('hidden');
+    document.getElementById('admin-banner').classList.add('flex');
+    showToast('已進入後台編輯模式');
+  } else {
+    isAdmin = false;
+    document.getElementById('admin-icon').textContent = '🔒';
+    document.getElementById('admin-banner').classList.add('hidden');
+    document.getElementById('admin-banner').classList.remove('flex');
+    showToast('已鎖定後台模式');
+  }
+  renderServices();
+}
+
+function updateServicePriceByIndex(modelId, serviceIndex, newPrice) {
+  const val = Math.max(0, Number(newPrice) || 0);
+  Object.keys(db).forEach(cat => {
+    const m = db[cat].find(x => x.id === modelId);
+    if (m && m.services[serviceIndex]) {
+      m.services[serviceIndex].price = val;
+      showToast(`已更新 ${m.services[serviceIndex].name} 為 NT$ ${val}`);
+    }
+  });
+  localStorage.setItem('qbro_repair_db_v5', JSON.stringify(db));
+}
+
+function resetDefaultData() {
+  if (confirm('確定要清除所有本機修改紀錄，還原成最初價目表嗎？')) {
+    localStorage.removeItem('qbro_repair_db_v5');
+    db = JSON.parse(JSON.stringify(DEFAULT_DB));
+    renderServices();
+    showToast('已還原為預設價目表');
+  }
+}
+
+function exportDataJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'qbro_prices_backup.json';
+  a.click();
+}
+
+function toggleLargeMode() {
+  isLargeMode = !isLargeMode;
+  document.body.classList.toggle('large-mode', isLargeMode);
+  const btn = document.getElementById('btn-large-text');
+  btn.classList.toggle('bg-brand-600', isLargeMode);
+  btn.classList.toggle('text-white', isLargeMode);
+}
+
+function toggleDarkMode() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('qbro_dark', isDark ? '1' : '0');
+  document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('opacity-0');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.add('opacity-0'), 2200);
+}
+
+init();
+</script>
+</body>
+</html>
